@@ -1,12 +1,10 @@
 import gzip
-from numpy import full
 import pandas as pd
 from pathlib import Path
 import requests
-import sqlalchemy as db 
+import sqlalchemy as db
 from dotenv import dotenv_values
 config = dotenv_values(".env")
-print(config['PASSWORD'])
 
 root_path = Path(__file__).parent
 dump_path = root_path.joinpath("dump/")
@@ -28,6 +26,12 @@ def download_file(url, filename):
 
 
 if __name__ == "__main__":
+    engine = db.create_engine(f"mysql+pymysql://{config['USERNAME']}:{config['PASSWORD']}@localhost/series")
+
+    with engine.connect() as connection:
+        connection.execute("DROP TABLE IF EXISTS data;")
+        connection.execute("DROP TABLE IF EXISTS titles;")
+
 
     if not dump_path.exists():
         dump_path.mkdir()
@@ -36,6 +40,7 @@ if __name__ == "__main__":
     download_file(title_basics_url, "title.basics.tsv.gz")
     download_file(title_episodes_url, "title.episodes.tsv.gz")
 
+    print("Loading title.basics.tsv.gz")
     with gzip.open(dump_path.joinpath("title.basics.tsv.gz"), "rb") as fp:
         basics_df = pd.read_csv(
             fp,
@@ -44,6 +49,15 @@ if __name__ == "__main__":
             na_values="\\N"
         )
 
+    with engine.connect() as connection:
+        basics_df[basics_df["titleType"] == "tvSeries"].drop(["titleType"], axis=1).to_sql(
+            'titles',
+            con=connection,
+            chunksize=1000,
+            index=False
+        )
+
+    print("Loading title.episodes.tsv.gz")
     with gzip.open(dump_path.joinpath("title.episodes.tsv.gz"), "rb") as fp:
         episodes_df = pd.read_csv(fp, sep="\t", na_values="\\N")
 
@@ -51,19 +65,15 @@ if __name__ == "__main__":
     episodes_df = episodes_df.merge(basics_df, on="tconst")
     basics_df = None
 
+    print("Loading title.ratings.tsv.gz")
     with gzip.open(dump_path.joinpath("title.ratings.tsv.gz"), "rb") as fp:
         ratings_df = pd.read_csv(fp, sep="\t", na_values="\\N")
 
     print("Merging data...")
     full_df = episodes_df.merge(ratings_df, on="tconst").drop(["titleType"], axis=1)
     full_df = full_df.astype({'seasonNumber': 'int64', 'episodeNumber': 'int64'}, errors="ignore")
-
     ratings_df = None
-
-    print(full_df.dtypes)
-    engine = db.create_engine(f"mysql+pymysql://{config['USERNAME']}:{config['PASSWORD']}@localhost/series")
     with engine.connect() as connection:
-        connection.execute("DROP TABLE IF EXISTS data;")
         full_df.to_sql('data', con=engine, index=False, chunksize=1000)
         full_df = None
         connection.execute("ALTER TABLE data ORDER BY parentTconst, seasonNumber, episodeNumber")
