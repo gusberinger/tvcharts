@@ -1,4 +1,5 @@
 import gzip
+from numpy import full
 import pandas as pd
 from pathlib import Path
 import requests
@@ -44,21 +45,27 @@ if __name__ == "__main__":
         )
 
     with gzip.open(dump_path.joinpath("title.episodes.tsv.gz"), "rb") as fp:
-        episodes_df = pd.read_csv(fp, sep="\t")
+        episodes_df = pd.read_csv(fp, sep="\t", na_values="\\N")
 
     print("Merging data...")
     episodes_df = episodes_df.merge(basics_df, on="tconst")
     basics_df = None
 
     with gzip.open(dump_path.joinpath("title.ratings.tsv.gz"), "rb") as fp:
-        ratings_df = pd.read_csv(fp, sep="\t")
+        ratings_df = pd.read_csv(fp, sep="\t", na_values="\\N")
 
     print("Merging data...")
     full_df = episodes_df.merge(ratings_df, on="tconst").drop(["titleType"], axis=1)
+    full_df = full_df.astype({'seasonNumber': 'int64', 'episodeNumber': 'int64'}, errors="ignore")
+
     ratings_df = None
+
+    print(full_df.dtypes)
     engine = db.create_engine(f"mysql+pymysql://{config['USERNAME']}:{config['PASSWORD']}@localhost/series")
     with engine.connect() as connection:
         connection.execute("DROP TABLE IF EXISTS data;")
         full_df.to_sql('data', con=engine, index=False, chunksize=1000)
+        full_df = None
+        connection.execute("ALTER TABLE data ORDER BY parentTconst, seasonNumber, episodeNumber")
 
 
