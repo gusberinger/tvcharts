@@ -68,7 +68,6 @@ const MovieChart = props => {
             hAxis: { title: "Episode Number" },
             lineWidth: (props.line == true) ? 3 : 0
           }}
-          // chartWrapperParams={{ view: { columns: [0,2,3,4]} }}
         /> :
         <Chart
           chartType='ScatterChart'
@@ -90,7 +89,6 @@ const MovieChart = props => {
             hAxis: { title: "Episode Number" },
             lineWidth: (props.line == true) ? 3 : 0
           }}
-          // chartWrapperParams={{ view: { columns: [0,2,3,4]} }}
         />
     }
     </>
