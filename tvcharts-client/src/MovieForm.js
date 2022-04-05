@@ -3,7 +3,7 @@ import MovieChart from './MovieChart'
 
 const MovieForm = () => {
   const [type, setType] = useState("rating")
-  const [lines, setLines] = useState(false)
+  const [lines, setLines] = useState(true)
   return (
     <>
       <section>
