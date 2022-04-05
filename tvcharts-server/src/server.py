@@ -9,15 +9,17 @@ config = dotenv_values(".env")
 engine = db.create_engine(f"mysql+pymysql://{config['USERNAME']}:{config['PASSWORD']}@localhost/series")
 app = Flask(__name__)
 
+with engine.connect() as connection:
+    request = connection.execute("SELECT * FROM titles")
+    titles = dict(request.fetchall())
+
 @app.route("/tconst/<tconst>")
 def get_series(tconst : str) -> dict:
     with engine.connect() as connection:
         results = connection.execute(f"SELECT * FROM data WHERE parentTconst='{tconst}'")
         rows = results.fetchall()
-
-    # max_season = rows[-1][3]
     result = defaultdict(lambda: {})
-
+    result[-1] = titles[tconst]
     for row in rows:
         tconst, _, seasonNumber, episodeNumber, primaryTitle, averageRating, numVotes = row
         seasonNumber = int(seasonNumber)
