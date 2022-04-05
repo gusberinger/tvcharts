@@ -3,12 +3,14 @@ import Chart from 'react-google-charts'
 
 const MovieChart = props => {
 
-  const [rows, setRows] = useState([])
+  const [voteRows, setVoteRows] = useState([])
+  const [ratingRows, setRatingRows] = useState([])
   const [title, setTitle] = useState("")
-  const colors = ["#8dd3c7", "#ffffb3", "#bebada", "#fb8072", "#80b1d3", "#fdb462", "#b3de69", "#fccde5", "#d9d9d9"]
+  const colors = ["#8dd3c7", "#bebada", "#fb8072", "#80b1d3", "#fdb462", "#b3de69", "#fccde5", "#d9d9d9"]
 
   const parseJson = data => {
-    let rows = []
+    let ratingRows = []
+    let voteRows = []
     let episodeIndex = 0
     for (const seasonNumber of Object.keys(data)) {
       if (seasonNumber == -1) {
@@ -19,15 +21,17 @@ const MovieChart = props => {
         for (const episodeNumber of Object.keys(data[seasonNumber])) {
           const episode = data[seasonNumber][episodeNumber]
           episodeIndex++
-          const votes = episode['votes']
           const title = episode['title']
           const rating = episode['rating']
+          const votes = episode['votes']
           const annotation = `<b>Season ${seasonNumber} Epsiode ${episodeNumber}</b><br/>${title}<br/>${votes.toLocaleString('en-US')} Votes<br/>${rating} Average Rating`
-          rows.push([episodeIndex, episode['rating'], episode['votes'],  annotation, seasonColor])
+          ratingRows.push([episodeIndex, rating, annotation, seasonColor])
+          voteRows.push([episodeIndex, votes, annotation, seasonColor])
         }
       }
     }
-    return rows
+    setRatingRows(ratingRows)
+    setVoteRows(voteRows)
   }
 
   useEffect(() => {
@@ -35,9 +39,7 @@ const MovieChart = props => {
       res => res.json()
     ).then(
       data => {
-        let rows = parseJson(data)
-        setRows(rows)
-        console.log(rows)
+        parseJson(data)
       }
     )
   }, [])
@@ -51,15 +53,14 @@ const MovieChart = props => {
           data={[[
             "Episode",
             "Rating",
-            "Votes",
             { role: "tooltip", type: "string", p: { html: true }},
             { role: "style"}
-          ], ...rows]}
+          ], ...ratingRows]}
           width="100%"
           height="600px"
           loader={<div>Loading Chart...</div>}
           options={{
-            title: (props.type == "rating") ? `IMDB Rating - ${title}` : `IMDB Votes - ${title}`,
+            title:  `IMDB Average Rating - ${title}`,
             tooltip: { isHtml: true },
             pointSize: 4,
             legend: 'none',
@@ -67,22 +68,21 @@ const MovieChart = props => {
             hAxis: { title: "Episode Number" },
             lineWidth: (props.line == true) ? 3 : 0
           }}
-          chartWrapperParams={{ view: { columns: [0,2,3,4]} }}
+          // chartWrapperParams={{ view: { columns: [0,2,3,4]} }}
         /> :
         <Chart
           chartType='ScatterChart'
           data={[[
             "Episode",
-            "Rating",
             "Votes",
             { role: "tooltip", type: "string", p: { html: true }},
             { role: "style"}
-          ], ...rows]}
+          ], ...voteRows]}
           width="100%"
           height="600px"
           loader={<div>Loading Chart...</div>}
           options={{
-            title: (props.type == "rating") ? `IMDB Votes - ${title}` : `IMDB Votes - ${title}`,
+            title: `IMDB Votes - ${title}`,
             tooltip: { isHtml: true },
             pointSize: 4,
             legend: 'none',
@@ -90,7 +90,7 @@ const MovieChart = props => {
             hAxis: { title: "Episode Number" },
             lineWidth: (props.line == true) ? 3 : 0
           }}
-          chartWrapperParams={{ view: { columns: [0,2,3,4]} }}
+          // chartWrapperParams={{ view: { columns: [0,2,3,4]} }}
         />
     }
     </>
