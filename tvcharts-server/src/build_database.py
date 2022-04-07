@@ -1,10 +1,10 @@
 import gzip
 import pandas as pd
+import numpy as np
 from pathlib import Path
 import requests
 import sqlalchemy as db
 from dotenv import dotenv_values
-
 
 config = dotenv_values(".env")
 root_path = Path(__file__).parent
@@ -64,6 +64,9 @@ if __name__ == "__main__":
     print("Merging ratings and titles")
     titles_df = basics_df[basics_df["titleType"] == "tvSeries"].drop(["titleType"], axis=1)
     titles_rated_df = titles_df.merge(ratings_df, on="tconst")
+    # titles_rated_df["numVotes"] = pd.to_numeric(titles_rated_df["numVotes"])
+    votes_std = np.std(titles_rated_df["numVotes"])
+    titles_rated_df["numVotes"] = titles_rated_df["numVotes"] / votes_std
     with engine.connect() as connection:
         titles_rated_df.to_sql(
             'titles',
