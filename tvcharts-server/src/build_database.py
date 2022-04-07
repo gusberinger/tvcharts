@@ -65,8 +65,8 @@ if __name__ == "__main__":
     titles_df = basics_df[basics_df["titleType"] == "tvSeries"].drop(["titleType"], axis=1)
     titles_rated_df = titles_df.merge(ratings_df, on="tconst")
     # titles_rated_df["numVotes"] = pd.to_numeric(titles_rated_df["numVotes"])
-    votes_std = np.std(titles_rated_df["numVotes"])
-    titles_rated_df["numVotes"] = titles_rated_df["numVotes"] / votes_std
+    # votes_std = np.std(titles_rated_df["numVotes"])
+    # titles_rated_df["numVotes"] = titles_rated_df["numVotes"] / votes_std
     with engine.connect() as connection:
         titles_rated_df.to_sql(
             'titles',
