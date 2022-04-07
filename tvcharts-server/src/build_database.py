@@ -4,8 +4,9 @@ from pathlib import Path
 import requests
 import sqlalchemy as db
 from dotenv import dotenv_values
-config = dotenv_values(".env")
 
+
+config = dotenv_values(".env")
 root_path = Path(__file__).parent
 dump_path = root_path.joinpath("dump/")
 title_ratings_url = "https://datasets.imdbws.com/title.ratings.tsv.gz"
@@ -24,14 +25,14 @@ def download_file(url, filename):
         print(f"{filename} Already exists, skipping")
 
 
-
 if __name__ == "__main__":
-    engine = db.create_engine(f"mysql+pymysql://{config['USERNAME']}:{config['PASSWORD']}@localhost/series")
+    engine = db.create_engine(
+        f"mysql+pymysql://{config['USERNAME']}:{config['PASSWORD']}@localhost/series"
+    )
 
     with engine.connect() as connection:
         connection.execute("DROP TABLE IF EXISTS data;")
         connection.execute("DROP TABLE IF EXISTS titles;")
-
 
     if not dump_path.exists():
         dump_path.mkdir()
@@ -49,25 +50,27 @@ if __name__ == "__main__":
             na_values="\\N"
         )
 
+    print("Loading title.episodes.tsv.gz")
+    with gzip.open(dump_path.joinpath("title.episodes.tsv.gz"), "rb") as fp:
+        episodes_df = pd.read_csv(fp, sep="\t", na_values="\\N")
+
+    print("Merging episdoes and basics...")
+    episodes_df = episodes_df.merge(basics_df, on="tconst")
+
+    print("Loading title.ratings.tsv.gz")
+    with gzip.open(dump_path.joinpath("title.ratings.tsv.gz"), "rb") as fp:
+        ratings_df = pd.read_csv(fp, sep="\t", na_values="\\N")
+
+    print("Merging ratings and titles")
+    titles_df = basics_df[basics_df["titleType"] == "tvSeries"].drop(["titleType"], axis=1)
+    titles_rated_df = titles_df.merge(ratings_df, on="tconst")
     with engine.connect() as connection:
-        basics_df[basics_df["titleType"] == "tvSeries"].drop(["titleType"], axis=1).to_sql(
+        titles_rated_df.to_sql(
             'titles',
             con=connection,
             chunksize=1000,
             index=False
         )
-
-    print("Loading title.episodes.tsv.gz")
-    with gzip.open(dump_path.joinpath("title.episodes.tsv.gz"), "rb") as fp:
-        episodes_df = pd.read_csv(fp, sep="\t", na_values="\\N")
-
-    print("Merging data...")
-    episodes_df = episodes_df.merge(basics_df, on="tconst")
-    basics_df = None
-
-    print("Loading title.ratings.tsv.gz")
-    with gzip.open(dump_path.joinpath("title.ratings.tsv.gz"), "rb") as fp:
-        ratings_df = pd.read_csv(fp, sep="\t", na_values="\\N")
 
     print("Merging data...")
     full_df = episodes_df.merge(ratings_df, on="tconst").drop(["titleType"], axis=1)
@@ -77,5 +80,3 @@ if __name__ == "__main__":
         full_df.to_sql('data', con=engine, index=False, chunksize=1000)
         full_df = None
         connection.execute("ALTER TABLE data ORDER BY parentTconst, seasonNumber, episodeNumber")
-
-
