@@ -3,8 +3,8 @@ import Chart from 'react-google-charts'
 
 const MovieChart = props => {
 
-  const [voteRows, setVoteRows] = useState([0, 0, "<div></div>", "color: #ffffff"])
-  const [ratingRows, setRatingRows] = useState([0, 0, "<div></div>", "color: #ffffff"])
+  const [voteRows, setVoteRows] = useState([[0,0, "", "color: #fff" ]])
+  const [ratingRows, setRatingRows] = useState([[0,0, "", "color: #fff" ]])
   const [title, setTitle] = useState("")
   const colors = ["#8dd3c7", "#bebada", "#fb8072", "#80b1d3", "#fdb462", "#b3de69", "#fccde5", "#d9d9d9"]
 
@@ -30,6 +30,7 @@ const MovieChart = props => {
         }
       }
     }
+    console.log(ratingRows[0])
     setRatingRows(ratingRows)
     setVoteRows(voteRows)
   }
@@ -39,6 +40,7 @@ const MovieChart = props => {
       res => res.json()
     ).then(
       data => {
+        console.log("none")
         parseJson(data)
       }
     ).catch(() => console.log("Error getting API"))
