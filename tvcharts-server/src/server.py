@@ -14,9 +14,12 @@ app = Flask(__name__)
 
 with engine.connect() as connection:
     results = connection.execute("SELECT tconst, primaryTitle from titles where numVotes > 1000").fetchall()
-    titles = [{"id": tconst, "title": title} for tconst, title in results]
+    titles_search = [{"id": tconst, "title": title} for tconst, title in results]
 
-title_json = json.dumps(titles)
+
+title_json = json.dumps(titles_search)
+find_title = dict(results)
+
 
 @app.route("/search/")
 def get_search():
@@ -30,7 +33,7 @@ def get_series(tconst : str) -> dict:
         rows = results.fetchall()
     episode_info = defaultdict(lambda: {})
     result = {}
-    result["title"] = titles[tconst]
+    result["title"] = find_title[tconst]
     result["episode_info"] = episode_info
 
     for row in rows:
