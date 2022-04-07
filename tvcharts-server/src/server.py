@@ -18,13 +18,16 @@ def get_series(tconst : str) -> dict:
     with engine.connect() as connection:
         results = connection.execute(f"SELECT * FROM data WHERE parentTconst='{tconst}'")
         rows = results.fetchall()
-    result = defaultdict(lambda: {})
-    result[-1] = titles[tconst]
+    episode_info = defaultdict(lambda: {})
+    result = {}
+    result["title"] = titles[tconst]
+    result["episode_info"] = episode_info
+
     for row in rows:
         tconst, _, seasonNumber, episodeNumber, primaryTitle, averageRating, numVotes = row
         seasonNumber = int(seasonNumber)
         episodeNumber = int(episodeNumber)
-        result[seasonNumber][episodeNumber] = {
+        result["episode_info"][seasonNumber][episodeNumber] = {
             "title": primaryTitle,
             "tconst": tconst,
             "rating": averageRating,
