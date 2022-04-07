@@ -1,22 +1,27 @@
 import sqlalchemy as db
-from typing import Iterable
-from collections import namedtuple, defaultdict
+from collections import defaultdict
 from dotenv import dotenv_values
 from flask import Flask
+import json
+
 config = dotenv_values(".env")
 
 
 engine = db.create_engine(f"mysql+pymysql://{config['USERNAME']}:{config['PASSWORD']}@localhost/series")
 app = Flask(__name__)
 
+
+
 with engine.connect() as connection:
-    request = connection.execute("SELECT * FROM titles")
-    titles = dict(request.fetchall())
+    results = connection.execute("SELECT tconst, primaryTitle from titles where numVotes > 1000").fetchall()
+    titles = [{"id": tconst, "title": title} for tconst, title in results]
 
+title_json = json.dumps(titles)
 
-@app.route("/search/<text>")
-def get_search(text):
-    pass
+@app.route("/search/")
+def get_search():
+    return title_json
+
 
 @app.route("/tconst/<tconst>")
 def get_series(tconst : str) -> dict:
