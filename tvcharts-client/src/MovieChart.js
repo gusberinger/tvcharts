@@ -12,14 +12,12 @@ const MovieChart = props => {
     let ratingRows = []
     let voteRows = []
     let episodeIndex = 0
-    for (const seasonNumber of Object.keys(data)) {
-      if (seasonNumber == -1) {
-        setTitle(data[seasonNumber])
-      }
-      else {
+    setTitle(data["title"])
+    const episode_info = data["episode_info"]
+    for (const seasonNumber of Object.keys(episode_info)) {
         const seasonColor = `color: ${colors[(seasonNumber -1 ) % colors.length]}`
-        for (const episodeNumber of Object.keys(data[seasonNumber])) {
-          const episode = data[seasonNumber][episodeNumber]
+        for (const episodeNumber of Object.keys(episode_info[seasonNumber])) {
+          const episode = episode_info[seasonNumber][episodeNumber]
           episodeIndex++
           const title = episode['title']
           const rating = episode['rating']
@@ -29,7 +27,6 @@ const MovieChart = props => {
           voteRows.push([episodeIndex, votes, annotation, seasonColor])
         }
       }
-    }
     console.log(ratingRows[0])
     setRatingRows(ratingRows)
     setVoteRows(voteRows)
@@ -43,7 +40,7 @@ const MovieChart = props => {
         console.log("none")
         parseJson(data)
       }
-    ).catch(() => console.log("Error getting API"))
+    )//.catch(() => console.log("Error getting API"))
   }, [])
 
   return (

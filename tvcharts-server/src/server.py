@@ -13,6 +13,11 @@ with engine.connect() as connection:
     request = connection.execute("SELECT * FROM titles")
     titles = dict(request.fetchall())
 
+
+@app.route("/search/<text>")
+def get_search(text):
+    pass
+
 @app.route("/tconst/<tconst>")
 def get_series(tconst : str) -> dict:
     with engine.connect() as connection:
