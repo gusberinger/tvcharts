@@ -1,7 +1,6 @@
 import React, {useState, useEffect} from 'react'
 import MovieChart from './MovieChart'
 import SearchBar from './SearchBar'
-import data from './TvData.json'
 import './MovieForm.css'
 
 
@@ -19,6 +18,17 @@ const MovieForm = () => {
   const [type, setType] = useState("rating")
   const [lines, setLines] = useState(true)
   const [show, setShow] = useState(topShows[Math.floor(Math.random()*topShows.length)])
+  const [searchData, setSearchData] = useState([{}])
+
+  useEffect(() => {
+    fetch(`/search/`).then(
+      res => res.json()
+    ).then(
+      data => {
+        setSearchData(data)
+      }
+    )
+  }, [])
 
 
   const selectItem = e => {
@@ -33,7 +43,7 @@ const MovieForm = () => {
         <div className="selectMovie">
           <button onClick={() => setLines(!lines)}>{lines ? "Hide Lines" : "Show Lines"}</button>
           <button onClick={() => (type == "rating") ? setType("votes") : setType("rating")}>{(type == "rating") ? 'Rating' : 'Votes'}</button>
-          <SearchBar placeholder="Search TV Show" data={data} selectItem={selectItem}/>
+          <SearchBar placeholder="Search TV Show" data={searchData} selectItem={selectItem}/>
         </div>
       </section>
       <div><MovieChart tconst={show} type={type} line={lines}/></div>
