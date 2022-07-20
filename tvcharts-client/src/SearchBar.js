@@ -1,5 +1,4 @@
 import React, {useState} from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import './SearchBar.css'
 
 
@@ -34,11 +33,6 @@ const SearchBar = ({placeholder, data, selectItem}) => {
           placeholder={placeholder}
           onChange={handleChange}
         />
-        <div className="searchIcon">
-          <i className="fa-pencil" title="Edit"></i>
-          {/* <FontAwesomeIcon icon="fa-solid fa-magnifying-glass" /> */}
-          {/* {filteredData.length != 0 ? <FontAwesomeIcon icon="fa-solid fa-magnifying-glass" /> : <FontAwesomeIcon icon="fa-solid fa-x" />} */}
-        </div>
       </div>
       <div className="dataResult">
         {filteredData.slice(0, 4).map((value, key) => {
