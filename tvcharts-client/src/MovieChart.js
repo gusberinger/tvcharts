@@ -7,6 +7,7 @@ const MovieChart = props => {
   const [ratingRows, setRatingRows] = useState([[0,0, "", "color: #fff" ]])
   const [title, setTitle] = useState("")
   const colors = ["#8dd3c7", "#bebada", "#fb8072", "#80b1d3", "#fdb462", "#b3de69", "#fccde5", "#d9d9d9"]
+  const [episodeCount, setEpisodeCount] = useState(200)
 
   const parseJson = data => {
     let ratingRows = []
@@ -29,6 +30,7 @@ const MovieChart = props => {
       }
     setRatingRows(ratingRows)
     setVoteRows(voteRows)
+    setEpisodeCount(episodeIndex)
   }
 
   useEffect(() => {
@@ -62,7 +64,7 @@ const MovieChart = props => {
             pointSize: 4,
             legend: 'none',
             vAxis: { title: "Average Rating" },
-            hAxis: { title: "Episode Number" },
+            hAxis: { title: "Episode Number" , viewWindow: {min: 0, max: episodeCount}},
             lineWidth: (props.line == true) ? 3 : 0,
             width_units: '%'
           }}
@@ -84,7 +86,8 @@ const MovieChart = props => {
             pointSize: 4,
             legend: 'none',
             vAxis: { title: "Number of Votes" },
-            hAxis: { title: "Episode Number" },
+            hAxis: { title: "Episode Number", viewWindow: {min: 0, max: episodeCount} },
+            // chartArea: {"width": "100%", "height": "100%", top: 0},
             lineWidth: (props.line == true) ? 3 : 0
           }}
         />
