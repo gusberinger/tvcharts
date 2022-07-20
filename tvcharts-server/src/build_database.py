@@ -54,19 +54,23 @@ if __name__ == "__main__":
     with gzip.open(dump_path.joinpath("title.episodes.tsv.gz"), "rb") as fp:
         episodes_df = pd.read_csv(fp, sep="\t", na_values="\\N")
 
+ 
+
     print("Merging episdoes and basics...")
     episodes_df = episodes_df.merge(basics_df, on="tconst")
+
 
     print("Loading title.ratings.tsv.gz")
     with gzip.open(dump_path.joinpath("title.ratings.tsv.gz"), "rb") as fp:
         ratings_df = pd.read_csv(fp, sep="\t", na_values="\\N")
 
     print("Merging ratings and titles")
+    # want to avoid searching for empty tv shows
+    titles = set(episodes_df["parentTconst"]) 
+      
     titles_df = basics_df[basics_df["titleType"] == "tvSeries"].drop(["titleType"], axis=1)
+    titles_df = titles_df[titles_df["tconst"].isin(titles)]
     titles_rated_df = titles_df.merge(ratings_df, on="tconst")
-    # titles_rated_df["numVotes"] = pd.to_numeric(titles_rated_df["numVotes"])
-    # votes_std = np.std(titles_rated_df["numVotes"])
-    # titles_rated_df["numVotes"] = titles_rated_df["numVotes"] / votes_std
     with engine.connect() as connection:
         titles_rated_df.to_sql(
             'titles',
