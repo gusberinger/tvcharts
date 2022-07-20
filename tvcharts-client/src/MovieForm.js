@@ -5,10 +5,20 @@ import data from './TvData.json'
 import './MovieForm.css'
 
 
+const topShows = [
+  "tt2297757",
+  "tt0141842",
+  "tt0903747",
+  "tt0386676",
+  "tt0098904",
+  "tt0108778"
+]
+
+
 const MovieForm = () => {
   const [type, setType] = useState("rating")
   const [lines, setLines] = useState(true)
-  const [show, setShow] = useState("tt0118375")
+  const [show, setShow] = useState(topShows[Math.floor(Math.random()*topShows.length)])
 
 
   const selectItem = e => {
