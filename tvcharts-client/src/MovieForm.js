@@ -1,34 +1,33 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import MovieChart from './MovieChart'
+import SearchBar from './SearchBar'
+import data from './TvData.json'
+import './MovieForm.css'
+// import { ReactSearchAutocomplete } from 'react-search-autocomplete'
+
 
 const MovieForm = () => {
   const [type, setType] = useState("rating")
   const [lines, setLines] = useState(true)
-  const [searchText, setSearchText] = useState("")
+  const [show, setShow] = useState("tt0118375")
 
 
-  const setMovie = (data) => {
-    console.log(searchText)
-  }
-
-  const handleChange = e => {
-    const val = e.target.value
-    setSearchText(val)
-    if (val.length > 4) {
-      // get searches
-    }
-
+  const selectItem = e => {
+    const newShow = e.target.getAttribute("tconst")
+    console.log(newShow)
+    setShow(newShow)
   }
 
   return (
     <>
       <section>
-        <button onClick={() => setLines(!lines)}>{lines ? "Hide Lines" : "Show Lines"}</button>
-        <button onClick={() => (type == "rating") ? setType("votes") : setType("rating")}>{(type == "rating") ? 'Rating' : 'Votes'}</button>
-        <input type="text" value={searchText} onChange={handleChange}/>
-        <button onClick={setMovie}>Search Movie</button>
+        <div className="selectMovie">
+          <button onClick={() => setLines(!lines)}>{lines ? "Hide Lines" : "Show Lines"}</button>
+          <button onClick={() => (type == "rating") ? setType("votes") : setType("rating")}>{(type == "rating") ? 'Rating' : 'Votes'}</button>
+          <SearchBar placeholder="The Sopranos" data={data} selectItem={selectItem}/>
+        </div>
       </section>
-      <div><MovieChart tconst="tt1439629" type={type} line={lines}/></div>
+      <div><MovieChart tconst={show} type={type} line={lines}/></div>
     </>
   )
 }
