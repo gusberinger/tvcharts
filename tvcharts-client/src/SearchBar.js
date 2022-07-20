@@ -7,7 +7,8 @@ const SearchBar = ({placeholder, data, selectItem}) => {
   const [word, setWord] = useState("")
 
   const handleChange = (e) => {
-    const word = e.target.value
+    const searched = e.target.value
+    setWord(searched)
     if (word != "") {
       const newFilter = data.filter((value) => {
         return value.title.toLowerCase().includes(word.toLowerCase())
@@ -32,6 +33,7 @@ const SearchBar = ({placeholder, data, selectItem}) => {
           type="text"
           placeholder={placeholder}
           onChange={handleChange}
+          value={word}
         />
       </div>
       <div className="dataResult">
