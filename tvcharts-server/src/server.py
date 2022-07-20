@@ -1,7 +1,7 @@
 import sqlalchemy as db
 from collections import defaultdict
 from dotenv import dotenv_values
-from flask import Flask
+from flask import Flask, jsonify
 import json
 
 config = dotenv_values(".env")
@@ -15,14 +15,15 @@ app = Flask(__name__)
 with engine.connect() as connection:
     results = connection.execute("SELECT tconst, primaryTitle from titles where numVotes > 1000").fetchall()
     titles_search = [{"id": tconst, "title": title} for tconst, title in results]
+    find_title = dict(results)
 
 
-title_json = json.dumps(titles_search)
-find_title = dict(results)
 
 
 @app.route("/search/")
 def get_search():
+    title_json = jsonify(titles_search)
+    title_json.headers.add('Access-Control-Allow-Origin', '*')
     return title_json
 
 
