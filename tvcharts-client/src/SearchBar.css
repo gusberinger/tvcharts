@@ -10,9 +10,12 @@
 .dataResult .dataItem {
   width: 100%;
   height: 30px;
-  display: flex;
-  align-items: center;
+  /* display: flex;
+  align-items: center; */
   color: black;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .dataItem p {
@@ -29,8 +32,8 @@ a {
 }
 
 a:hover {
-    text-decoration: underline;
-    color: lightgrey;
+  text-decoration: underline;
+  color: lightgrey;
 }
 
 input:focus {
