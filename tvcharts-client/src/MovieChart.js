@@ -43,6 +43,29 @@ const MovieChart = props => {
     )
   }, [props.tconst])
 
+  
+  const optionsTemplate = {
+    tooltip: { isHtml: true },
+      pointSize: 4,
+      legend: 'none',
+      hAxis: { title: "Episode Number" , 
+      viewWindow: {min: 0, max: episodeCount}},
+      lineWidth: (props.line == true) ? 3 : 0,
+    }
+
+  const ratingOptions = {
+    ...optionsTemplate,
+    title:  `IMDB Average Rating - ${title}`,
+    vAxis: { title: "Average Rating" },
+    width_units: '%'
+  }
+
+  const votesOptions = {
+    ...optionsTemplate,
+    title: `IMDB Votes - ${title}`,
+    vAxis: { title: "Number of Votes" },
+  }
+
   return (
     <>
     {
@@ -58,16 +81,7 @@ const MovieChart = props => {
           width="100%"
           height="600px"
           loader={<div>Loading Chart...</div>}
-          options={{
-            title:  `IMDB Average Rating - ${title}`,
-            tooltip: { isHtml: true },
-            pointSize: 4,
-            legend: 'none',
-            vAxis: { title: "Average Rating" },
-            hAxis: { title: "Episode Number" , viewWindow: {min: 0, max: episodeCount}},
-            lineWidth: (props.line == true) ? 3 : 0,
-            width_units: '%'
-          }}
+          options={ratingOptions}
         /> :
         <Chart
           chartType='ScatterChart'
@@ -80,16 +94,7 @@ const MovieChart = props => {
           width="100%"
           height="600px"
           loader={<div>Loading Chart...</div>}
-          options={{
-            title: `IMDB Votes - ${title}`,
-            tooltip: { isHtml: true },
-            pointSize: 4,
-            legend: 'none',
-            vAxis: { title: "Number of Votes" },
-            hAxis: { title: "Episode Number", viewWindow: {min: 0, max: episodeCount} },
-            // chartArea: {"width": "100%", "height": "100%", top: 0},
-            lineWidth: (props.line == true) ? 3 : 0
-          }}
+          options={votesOptions}
         />
     }
     </>
