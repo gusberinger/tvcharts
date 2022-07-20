@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react'
 import MovieChart from './MovieChart'
 import SearchBar from './SearchBar'
-import './MovieForm.css'
+import './App.css'
 
 
 const topShows = [
@@ -14,7 +14,7 @@ const topShows = [
 ]
 
 
-const MovieForm = () => {
+const App = () => {
   const [type, setType] = useState("rating")
   const [lines, setLines] = useState(true)
   const [show, setShow] = useState(topShows[Math.floor(Math.random()*topShows.length)])
@@ -51,4 +51,4 @@ const MovieForm = () => {
   )
 }
 
-export default MovieForm
+export default App
