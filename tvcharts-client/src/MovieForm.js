@@ -24,7 +24,7 @@ const MovieForm = () => {
         <div className="selectMovie">
           <button onClick={() => setLines(!lines)}>{lines ? "Hide Lines" : "Show Lines"}</button>
           <button onClick={() => (type == "rating") ? setType("votes") : setType("rating")}>{(type == "rating") ? 'Rating' : 'Votes'}</button>
-          <SearchBar placeholder="The Sopranos" data={data} selectItem={selectItem}/>
+          <SearchBar placeholder="Search TV Show" data={data} selectItem={selectItem}/>
         </div>
       </section>
       <div><MovieChart tconst={show} type={type} line={lines}/></div>
