@@ -27,7 +27,6 @@ const MovieChart = props => {
           voteRows.push([episodeIndex, votes, annotation, seasonColor])
         }
       }
-    console.log(ratingRows[0])
     setRatingRows(ratingRows)
     setVoteRows(voteRows)
   }
@@ -37,11 +36,10 @@ const MovieChart = props => {
       res => res.json()
     ).then(
       data => {
-        console.log("none")
         parseJson(data)
       }
-    )//.catch(() => console.log("Error getting API"))
-  }, [])
+    )
+  }, [props.tconst])
 
   return (
     <>
@@ -65,7 +63,8 @@ const MovieChart = props => {
             legend: 'none',
             vAxis: { title: "Average Rating" },
             hAxis: { title: "Episode Number" },
-            lineWidth: (props.line == true) ? 3 : 0
+            lineWidth: (props.line == true) ? 3 : 0,
+            width_units: '%'
           }}
         /> :
         <Chart
