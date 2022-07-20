@@ -3,7 +3,6 @@ import MovieChart from './MovieChart'
 import SearchBar from './SearchBar'
 import data from './TvData.json'
 import './MovieForm.css'
-// import { ReactSearchAutocomplete } from 'react-search-autocomplete'
 
 
 const MovieForm = () => {
