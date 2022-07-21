@@ -1,6 +1,5 @@
 import gzip
 import pandas as pd
-import numpy as np
 from pathlib import Path
 import requests
 import sqlalchemy as db
@@ -27,7 +26,7 @@ def download_file(url, filename):
 
 if __name__ == "__main__":
     engine = db.create_engine(
-        f"mysql+pymysql://{config['USERNAME']}:{config['PASSWORD']}@localhost/series"
+        f"mysql+pymysql://{config['USERNAME']}:{config['PASSWORD']}@127.0.0.1/series"
     )
 
     with engine.connect() as connection:
@@ -53,8 +52,9 @@ if __name__ == "__main__":
     print("Loading title.episodes.tsv.gz")
     with gzip.open(dump_path.joinpath("title.episodes.tsv.gz"), "rb") as fp:
         episodes_df = pd.read_csv(fp, sep="\t", na_values="\\N")
+    episodes_df = episodes_df[episodes_df['seasonNumber'].notnull() & episodes_df['episodeNumber'].notnull()]
 
-    print("Merging episdoes and basics...")
+    print("Merging episodes and basics...")
     episodes_df = episodes_df.merge(basics_df, on="tconst")
 
     print("Loading title.ratings.tsv.gz")

@@ -39,8 +39,8 @@ const SearchBar = ({placeholder, data, selectItem}) => {
       <div className="dataResult">
         {filteredData.slice(0, 4).map((value, key) => {
           return (
-          <a className="dataItem" target="_blank" onClick={handleSelect} id={value.id}>
-            <p tconst={value.id}>{value.title}</p>
+          <a className="dataItem" target="_blank" onClick={handleSelect} id={value.id} key={key}>
+            <p tconst={value.id}>{value.title} ({value.startYear}–{value.endYear})</p>
           </a>
           )
         })}
