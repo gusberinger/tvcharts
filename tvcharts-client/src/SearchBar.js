@@ -9,7 +9,7 @@ const SearchBar = ({placeholder, data, selectItem}) => {
   const handleChange = (e) => {
     const searched = e.target.value
     setWord(searched)
-    if (word != "") {
+    if (word !== "") {
       const newFilter = data.filter((value) => {
         return value.title.toLowerCase().includes(word.toLowerCase())
       })
@@ -21,6 +21,7 @@ const SearchBar = ({placeholder, data, selectItem}) => {
   }
 
   const handleSelect = e => {
+    e.preventDefault()
     setFilteredData([])
     setWord("")
     selectItem(e)
@@ -37,9 +38,9 @@ const SearchBar = ({placeholder, data, selectItem}) => {
         />
       </div>
       <div className="dataResult">
-        {filteredData.slice(0, 4).map((value, key) => {
+        {filteredData.slice(0, 15).map((value, key) => {
           return (
-          <a className="dataItem" target="_blank" onClick={handleSelect} id={value.id} key={key}>
+          <a className="dataItem" target="_blank" onClick={handleSelect} id={value.id} key={key} href="#">
             <p tconst={value.id}>{value.title} ({value.startYear}–{value.endYear})</p>
           </a>
           )
