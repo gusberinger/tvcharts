@@ -1,0 +1,26 @@
+version: '3.1'
+
+services:
+
+  mysql:
+    image: mysql:5.7
+    container_name: mysql
+    environment:
+      MYSQL_DATABASE: 'series'
+      MYSQL_ROOT_PASSWORD: 'password'
+    volumes:
+      - ./data/conf.d:/etc/mysql/conf.d
+      - ./data/logs:/logs
+      - /usr/local/var/mysql:/var/lib/mysql
+
+  api:
+    build:
+      context: "tvcharts-server"
+    ports:
+        - 5000:5000
+    volumes:
+      - ./tvcharts-server:/server 
+    links:
+      - mysql
+    depends_on:
+      - mysql
