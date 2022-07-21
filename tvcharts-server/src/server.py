@@ -29,11 +29,16 @@ def get_search():
 
 @app.route("/poster/<tconst>")
 def get_poster(tconst: str):
-    api_key = config["OMDB_API_KEY"]
-    url = f"http://img.omdbapi.com/?apikey={api_key}&i={tconst}"
-    omdb_response = requests.get(url)
-    if omdb_response.ok:
-        response = make_response(omdb_response.content)
+    api_key = config["THE_MOVIEDB_API_KEY"]
+    url = f"https://api.themoviedb.org/3/find/{tconst}?api_key={api_key}&language=en-US&external_source=imdb_id"
+    print(url)
+    tmdb_response = requests.get(url)
+    if tmdb_response.ok:
+        print(tmdb_response.json())
+        poster_path = tmdb_response.json()["tv_results"][0]["poster_path"]
+        poster_url = f"https://image.tmdb.org/t/p/w200/{poster_path}"
+        poster_resonse = requests.get(poster_url)
+        response = make_response(poster_resonse.content)
         response.headers.set("Content-Type", "image/jpeg")
         response.headers.set(
             "Content-Disposition", "attachment", filename=f"{tconst}.jpg"
