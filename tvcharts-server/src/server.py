@@ -1,7 +1,8 @@
+import requests
 import sqlalchemy as db
 from collections import defaultdict
 from dotenv import dotenv_values
-from flask import Flask, jsonify
+from flask import Flask, jsonify, make_response, send_file
 
 
 config = dotenv_values(".env")
@@ -13,9 +14,9 @@ app = Flask(__name__)
 
 with engine.connect() as connection:
     results = connection.execute(
-        "SELECT tconst, primaryTitle from titles where numVotes > 1000"
+        "SELECT tconst, primaryTitle, startYear, endYear from titles where numVotes > 1000"
     ).fetchall()
-    titles_search = [{"id": tconst, "title": title} for tconst, title in results]
+    titles_search = [{"id": tconst, "title": title} for tconst, title, startYear, endYear in results]
     find_title = dict(results)
 
 
@@ -24,6 +25,22 @@ def get_search():
     title_json = jsonify(titles_search)
     title_json.headers.add("Access-Control-Allow-Origin", "*")
     return title_json
+
+
+@app.route("/poster/<tconst>")
+def get_poster(tconst: str):
+    api_key = config["OMDB_API_KEY"]
+    url = f"http://img.omdbapi.com/?apikey={api_key}&i={tconst}"
+    omdb_response = requests.get(url)
+    if omdb_response.ok:
+        response = make_response(omdb_response.content)
+        response.headers.set("Content-Type", "image/jpeg")
+        response.headers.set(
+            "Content-Disposition", "attachment", filename=f"{tconst}.jpg"
+        )
+        return response
+    else:
+        return ""
 
 
 @app.route("/tconst/<tconst>")

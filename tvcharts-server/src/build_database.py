@@ -47,18 +47,15 @@ if __name__ == "__main__":
             fp,
             sep="\t",
             usecols=["tconst", "titleType", "primaryTitle", "startYear", "endYear"],
-            na_values="\\N"
+            na_values="\\N",
         )
 
     print("Loading title.episodes.tsv.gz")
     with gzip.open(dump_path.joinpath("title.episodes.tsv.gz"), "rb") as fp:
         episodes_df = pd.read_csv(fp, sep="\t", na_values="\\N")
 
- 
-
     print("Merging episdoes and basics...")
     episodes_df = episodes_df.merge(basics_df, on="tconst")
-
 
     print("Loading title.ratings.tsv.gz")
     with gzip.open(dump_path.joinpath("title.ratings.tsv.gz"), "rb") as fp:
@@ -66,23 +63,24 @@ if __name__ == "__main__":
 
     print("Merging ratings and titles")
     # want to avoid searching for empty tv shows
-    titles = set(episodes_df["parentTconst"]) 
-    titles_df = basics_df[basics_df["titleType"] == "tvSeries"].drop(["titleType"], axis=1)
+    titles = set(episodes_df["parentTconst"])
+    titles_df = basics_df[basics_df["titleType"] == "tvSeries"].drop(
+        ["titleType"], axis=1
+    )
     titles_df = titles_df[titles_df["tconst"].isin(titles)]
     titles_rated_df = titles_df.merge(ratings_df, on="tconst")
     with engine.connect() as connection:
-        titles_rated_df.to_sql(
-            'titles',
-            con=connection,
-            chunksize=1000,
-            index=False
-        )
+        titles_rated_df.to_sql("titles", con=connection, chunksize=1000, index=False)
 
     print("Merging data...")
     full_df = episodes_df.merge(ratings_df, on="tconst").drop(["titleType"], axis=1)
-    full_df = full_df.astype({'seasonNumber': 'int64', 'episodeNumber': 'int64'}, errors="ignore")
+    full_df = full_df.astype(
+        {"seasonNumber": "int64", "episodeNumber": "int64"}, errors="ignore"
+    )
     ratings_df = None
     with engine.connect() as connection:
-        full_df.to_sql('data', con=engine, index=False, chunksize=1000)
+        full_df.to_sql("data", con=engine, index=False, chunksize=1000)
         full_df = None
-        connection.execute("ALTER TABLE data ORDER BY parentTconst, seasonNumber, episodeNumber")
+        connection.execute(
+            "ALTER TABLE data ORDER BY parentTconst, seasonNumber, episodeNumber"
+        )
