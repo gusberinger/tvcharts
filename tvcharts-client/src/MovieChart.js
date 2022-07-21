@@ -58,7 +58,7 @@ const MovieChart = props => {
   const ratingOptions = {
     ...optionsTemplate,
     title:  `IMDB Average Rating - ${title}`,
-    vAxis: { title: "Average Rating" },
+    vAxis: { title: "Average Rating", viewWindow: (props.scaleY) ? {min: 0, max: 10} : {}},
     width_units: '%'
   }
 
@@ -78,7 +78,7 @@ const MovieChart = props => {
             "Episode",
             "Rating",
             { role: "tooltip", type: "string", p: { html: true }},
-            { role: "style"}
+            { role: (props.showColors ? "style" : "none" )}
           ], ...ratingRows]}
           width="100%"
           height="600px"
