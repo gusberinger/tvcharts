@@ -45,7 +45,7 @@ const MovieChart = props => {
 
   
   const optionsTemplate = {
-    tooltip: { isHtml: true },
+    tooltip: { isHtml: true, trigger: 'both' },
       pointSize: 4,
       legend: 'none',
       hAxis: { 
