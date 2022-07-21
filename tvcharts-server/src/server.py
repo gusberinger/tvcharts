@@ -1,9 +1,8 @@
-from tracemalloc import start
 import requests
 import sqlalchemy as db
 from collections import defaultdict
 from dotenv import dotenv_values
-from flask import Flask, jsonify, make_response, send_file
+from flask import Flask, jsonify, make_response
 
 
 config = dotenv_values(".env")
