@@ -48,8 +48,10 @@ const MovieChart = props => {
     tooltip: { isHtml: true },
       pointSize: 4,
       legend: 'none',
-      hAxis: { title: "Episode Number" , 
-      viewWindow: {min: 0, max: episodeCount}},
+      hAxis: { 
+        title: "Episode Number" ,
+        format: 0,
+        viewWindow: {min: 1, max: episodeCount}},
       lineWidth: (props.line == true) ? 3 : 0,
     }
 
