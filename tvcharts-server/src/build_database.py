@@ -46,7 +46,7 @@ if __name__ == "__main__":
         basics_df = pd.read_csv(
             fp,
             sep="\t",
-            usecols=["tconst", "titleType", "primaryTitle"],
+            usecols=["tconst", "titleType", "primaryTitle", "startYear", "endYear"],
             na_values="\\N"
         )
 
@@ -67,7 +67,6 @@ if __name__ == "__main__":
     print("Merging ratings and titles")
     # want to avoid searching for empty tv shows
     titles = set(episodes_df["parentTconst"]) 
-      
     titles_df = basics_df[basics_df["titleType"] == "tvSeries"].drop(["titleType"], axis=1)
     titles_df = titles_df[titles_df["tconst"].isin(titles)]
     titles_rated_df = titles_df.merge(ratings_df, on="tconst")
