@@ -1,3 +1,4 @@
+from tracemalloc import start
 import requests
 import sqlalchemy as db
 from collections import defaultdict
@@ -16,8 +17,8 @@ with engine.connect() as connection:
     results = connection.execute(
         "SELECT tconst, primaryTitle, startYear, endYear from titles where numVotes > 1000"
     ).fetchall()
-    titles_search = [{"id": tconst, "title": title} for tconst, title, startYear, endYear in results]
-    find_title = dict(results)
+    titles_search = [{"id": tconst, "title": title, "startYear": startYear, "endYear": endYear} for tconst, title, startYear, endYear in results]
+    find_title = dict([(x[0], x[1]) for x in results])
 
 
 @app.route("/search/")
@@ -62,6 +63,8 @@ def get_series(tconst: str) -> dict:
             seasonNumber,
             episodeNumber,
             primaryTitle,
+            startYear,
+            endYear,
             averageRating,
             numVotes,
         ) = row
