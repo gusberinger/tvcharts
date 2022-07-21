@@ -2,7 +2,7 @@ import React, {useState} from 'react'
 import './SearchBar.css'
 
 
-const SearchBar = ({placeholder, data, selectItem, key}) => {
+const SearchBar = ({placeholder, data, selectItem}) => {
   const [filteredData, setFilteredData] = useState([])
   const [word, setWord] = useState("")
 
@@ -39,7 +39,7 @@ const SearchBar = ({placeholder, data, selectItem, key}) => {
       <div className="dataResult">
         {filteredData.slice(0, 4).map((value, key) => {
           return (
-          <a className="dataItem" target="_blank" onClick={handleSelect} id={value.id}>
+          <a className="dataItem" target="_blank" onClick={handleSelect} id={value.id} key={key}>
             <p tconst={value.id}>{value.title} ({value.startYear}–{value.endYear})</p>
           </a>
           )
