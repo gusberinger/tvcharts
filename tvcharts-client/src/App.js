@@ -23,7 +23,7 @@ const App = () => {
   const [searchData, setSearchData] = useState([{}])
 
   useEffect(() => {
-    const url = `/search`
+    const url = `http://localhost:5000/search`
     fetch(url).then(
       res => res.json()
     ).then(
@@ -46,7 +46,7 @@ const App = () => {
       <h1 className='site-title center-text'>TV Charts</h1>
       <div className='hero'>
 
-        <img src={`/poster/${show}`} alt=""/>
+        <img src={`http://localhost:5000/poster/${show}`} alt=""/>
         <div className="selectMovie">
           <button onClick={() => setLines(!lines)}>{lines ? "Hide Lines" : "Show Lines"}</button>
           <button onClick={() => (type === "rating") ? setType("votes") : setType("rating")}>{(type === "rating") ? 'Rating' : 'Votes'}</button>
