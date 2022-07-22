@@ -34,7 +34,7 @@ const MovieChart = props => {
   }
 
   useEffect(() => {
-    const url = `/tconst/${props.tconst}`
+    const url = `http://localhost:5000/tconst/${props.tconst}`
     fetch(url).then(
       res => res.json()
     ).then(

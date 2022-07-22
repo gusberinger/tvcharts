@@ -4,7 +4,7 @@ import sqlalchemy as db
 from collections import defaultdict
 from dotenv import dotenv_values
 from flask import Flask, jsonify, make_response
-
+from flask_cors import CORS
 
 config = dotenv_values(".env")
 root_path = Path(__file__).parent
@@ -12,6 +12,7 @@ dump_path = root_path.joinpath("dump/")
 db_path = dump_path.joinpath("db.sqlite")
 engine = db.create_engine(f"sqlite:///{db_path}")
 app = Flask(__name__)
+CORS(app)
 
 
 with engine.connect() as connection:
@@ -28,7 +29,7 @@ with engine.connect() as connection:
 @app.route("/search/", methods=["GET"])
 def get_search():
     title_json = jsonify(titles_search)
-    title_json.headers.add("Access-Control-Allow-Origin", "*")
+    title_json.headers.add('Access-Control-Allow-Origin', '*')
     return title_json
 
 
