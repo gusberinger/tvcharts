@@ -1,3 +1,4 @@
+from encodings import search_function
 import gzip
 import pandas as pd
 from pathlib import Path
@@ -43,24 +44,6 @@ if __name__ == "__main__":
     download_file(title_basics_url, "title.basics.tsv.gz")
     download_file(title_episodes_url, "title.episodes.tsv.gz")
 
-    # load title.basics in chunks into search table
-    # the progress bars from tqdm are approximate
-    chunksize = 10**6
-    with gzip.open(dump_path.joinpath("title.basics.tsv.gz"), "rb") as fp:
-        with pd.read_csv(
-            fp,
-            sep="\t",
-            usecols=["tconst", "titleType", "primaryTitle", "startYear", "endYear"],
-            na_values="\\N",
-            chunksize=chunksize,
-        ) as reader:
-            for chunk in tqdm(reader, total=9087186 // chunksize):
-                series_info = chunk[chunk["titleType"] == "tvSeries"]
-                series_info = series_info.drop(["titleType"], axis=1)
-                series_info.to_sql(
-                    "search", con=engine, if_exists="append", index=False
-                )
-
     # load title.episodes into episodes table
     chunksize = 10**6
     with gzip.open(dump_path.joinpath("title.episodes.tsv.gz"), "rb") as fp:
@@ -98,18 +81,25 @@ if __name__ == "__main__":
         connection.execute("DROP TABLE ratings")
 
 
+    # find all tconst in episodes to avoid extra rows in search table
     with engine.connect() as connection:
-        # find all tconst of shows in both search and ratings
         episode_query = connection.execute("SELECT DISTINCT parentTconst FROM episodes").fetchall()
-        episodes_tconst= {x[0] for x in episode_query}
-        search_query = connection.execute("SELECT DISTINCT tconst FROM search").fetchall()
-        search_tconst = {x[0] for x in search_query}
-        
-        search_remove = search_tconst.difference(episodes_tconst)
-        episodes_remove = episodes_tconst.difference(search_tconst)
-        print(f"Removing {len(search_remove) + len(episodes_remove):,} from database...")
-        # query = f"SELECT * FROM episodes WHERE rowid in ({','.join(['?']*len(args))})"
-        # cursor.execute(query, args)
- 
+        episodes_tconst = {x[0] for x in episode_query}
 
-        
+    # load title.basics in chunks into search table
+    chunksize = 10**6
+    with gzip.open(dump_path.joinpath("title.basics.tsv.gz"), "rb") as fp:
+        with pd.read_csv(
+            fp,
+            sep="\t",
+            usecols=["tconst", "titleType", "primaryTitle", "startYear", "endYear"],
+            na_values="\\N",
+            chunksize=chunksize,
+        ) as reader:
+            for chunk in tqdm(reader, total=9087186 // chunksize):
+                series_info = chunk[chunk["titleType"] == "tvSeries"]
+                series_info = series_info.drop(["titleType"], axis=1)
+                series_info = series_info[series_info["tconst"].isin(episodes_tconst)]
+                series_info.to_sql(
+                    "search", con=engine, if_exists="append", index=False
+                )
