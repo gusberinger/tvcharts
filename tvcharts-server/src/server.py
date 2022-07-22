@@ -25,7 +25,7 @@ with engine.connect() as connection:
     find_title = dict([(x[0], x[1]) for x in results])
 
 
-@app.route("/search/")
+@app.route("/search/", methods=["GET"])
 def get_search():
     title_json = jsonify(titles_search)
     title_json.headers.add("Access-Control-Allow-Origin", "*")
@@ -33,7 +33,7 @@ def get_search():
 
 
 @app.route("/poster/<tconst>")
-def get_poster(tconst: str):
+def get_poster(tconst: str, methods=["GET"]):
     api_key = config["THE_MOVIEDB_API_KEY"]
     url = f"https://api.themoviedb.org/3/find/{tconst}?api_key={api_key}&language=en-US&external_source=imdb_id"
     print(url)
@@ -48,12 +48,13 @@ def get_poster(tconst: str):
         response.headers.set(
             "Content-Disposition", "attachment", filename=f"{tconst}.jpg"
         )
+        response.headers.add('Access-Control-Allow-Origin', '*')
         return response
     else:
         return ""
 
 
-@app.route("/tconst/<tconst>")
+@app.route("/tconst/<tconst>", methods=["GET"])
 def get_series(tconst: str) -> dict:
     with engine.connect() as connection:
         results = connection.execute(
@@ -85,7 +86,9 @@ def get_series(tconst: str) -> dict:
             "rating": averageRating,
             "votes": numVotes,
         }
-    return result
+    json = jsonify(result)
+    json.headers.add("Access-Control-Allow-Origin", "*")
+    return json
 
 
 if __name__ == "__main__":
