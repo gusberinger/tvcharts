@@ -1,3 +1,4 @@
+from pathlib import Path
 import requests
 import sqlalchemy as db
 from collections import defaultdict
@@ -6,9 +7,10 @@ from flask import Flask, jsonify, make_response
 
 
 config = dotenv_values(".env")
-engine = db.create_engine(
-    f"mysql+pymysql://{config['USERNAME']}:{config['PASSWORD']}@localhost/series"
-)
+root_path = Path(__file__).parent
+dump_path = root_path.joinpath("dump/")
+db_path = dump_path.joinpath("db.sqlite")
+engine = db.create_engine(f"sqlite:///{db_path}")
 app = Flask(__name__)
 
 
@@ -16,7 +18,10 @@ with engine.connect() as connection:
     results = connection.execute(
         "SELECT tconst, primaryTitle, startYear, endYear from titles where numVotes > 1000"
     ).fetchall()
-    titles_search = [{"id": tconst, "title": title, "startYear": startYear, "endYear": endYear} for tconst, title, startYear, endYear in results]
+    titles_search = [
+        {"id": tconst, "title": title, "startYear": startYear, "endYear": endYear}
+        for tconst, title, startYear, endYear in results
+    ]
     find_title = dict([(x[0], x[1]) for x in results])
 
 
@@ -84,4 +89,4 @@ def get_series(tconst: str) -> dict:
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
