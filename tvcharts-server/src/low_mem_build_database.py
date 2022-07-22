@@ -19,6 +19,7 @@ title_episodes_url = "https://datasets.imdbws.com/title.episode.tsv.gz"
 def download_file(url, filename):
     filepath = dump_path.joinpath(filename)
     if not filepath.exists():
+        print(f"Downloading {filename}...")
         response = requests.get(url)
         with open(filepath, "wb") as fp:
             fp.write(response.content)
@@ -41,7 +42,6 @@ if __name__ == "__main__":
     download_file(title_basics_url, "title.basics.tsv.gz")
     download_file(title_episodes_url, "title.episodes.tsv.gz")
 
-    
     # load title.basics in chunks into search table
     with gzip.open(dump_path.joinpath("title.basics.tsv.gz"), "rb") as fp:
         with pd.read_csv(
@@ -52,12 +52,13 @@ if __name__ == "__main__":
             chunksize=1000,
         ) as reader:
             for chunk in reader:
+                print(chunk.head())
                 series_info = chunk[chunk["titleType"] == "tvSeries"]
                 series_info = series_info.drop(["titleType"], axis=1)
                 series_info.to_sql(
                     "search", con=engine, if_exists="append", index=False
                 )
-    
+
     # load title.episodes into episodes table
     with gzip.open(dump_path.joinpath("title.episodes.tsv.gz"), "rb") as fp:
         with pd.read_csv(
@@ -65,8 +66,7 @@ if __name__ == "__main__":
             sep="\t",
             usecols=["tconst", "parentTconst", "seasonNumber", "episodeNumber"],
             na_values="\\N",
-            chunksize=1000
+            chunksize=1000,
         ) as reader:
             for chunk in reader:
-                
-
+                chunk.to_sql("episodes", con=engine, if_exists="append", index=False)
