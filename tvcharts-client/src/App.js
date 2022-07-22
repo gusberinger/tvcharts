@@ -23,7 +23,8 @@ const App = () => {
   const [searchData, setSearchData] = useState([{}])
 
   useEffect(() => {
-    fetch(`/search/`).then(
+    const url = `/search`
+    fetch(url).then(
       res => res.json()
     ).then(
       data => {
@@ -48,8 +49,8 @@ const App = () => {
         <img src={`/poster/${show}`} alt=""/>
         <div className="selectMovie">
           <button onClick={() => setLines(!lines)}>{lines ? "Hide Lines" : "Show Lines"}</button>
-          <button onClick={() => (type == "rating") ? setType("votes") : setType("rating")}>{(type == "rating") ? 'Rating' : 'Votes'}</button>
-          {(type == "rating") ? 
+          <button onClick={() => (type === "rating") ? setType("votes") : setType("rating")}>{(type === "rating") ? 'Rating' : 'Votes'}</button>
+          {(type === "rating") ? 
           <button onClick={() => setScaleY(!scaleY)}>{scaleY ? "Scale Y-Axis" : "Unscale Y-Axis"}</button>
           : <></>}
           <button onClick={() => setColors(!colors)}>{colors ? "Hide Colors" : "Show Colors"}</button>
