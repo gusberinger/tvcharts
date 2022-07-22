@@ -1,0 +1,8 @@
+FROM python:3
+
+WORKDIR /app
+COPY . .
+RUN pip install -r requirements.txt
+
+RUN ["python", "src/build_database.py"]
+CMD ["gunicorn", "-w", "2", "-b", "0.0.0.0:5000", "--chdir", "src/", "server:app"]

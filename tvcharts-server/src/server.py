@@ -2,11 +2,10 @@ from pathlib import Path
 import requests
 import sqlalchemy as db
 from collections import defaultdict
-from dotenv import dotenv_values
+import os
 from flask import Flask, jsonify, make_response
 from flask_cors import CORS
 
-config = dotenv_values(".env")
 root_path = Path(__file__).parent
 dump_path = root_path.joinpath("dump/")
 db_path = dump_path.joinpath("db.sqlite")
@@ -35,12 +34,10 @@ def get_search():
 
 @app.route("/poster/<tconst>")
 def get_poster(tconst: str, methods=["GET"]):
-    api_key = config["THE_MOVIEDB_API_KEY"]
+    api_key = os.environ.get("THE_MOVIEDB_API_KEY")
     url = f"https://api.themoviedb.org/3/find/{tconst}?api_key={api_key}&language=en-US&external_source=imdb_id"
-    print(url)
     tmdb_response = requests.get(url)
     if tmdb_response.ok:
-        print(tmdb_response.json())
         poster_path = tmdb_response.json()["tv_results"][0]["poster_path"]
         poster_url = f"https://image.tmdb.org/t/p/w200/{poster_path}"
         poster_resonse = requests.get(poster_url)

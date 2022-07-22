@@ -1,0 +1,20 @@
+version: '3.1'
+
+services:
+  api:
+    container_name: api
+    build:
+      context: "tvcharts-server"
+    ports:
+      - 5000:5000
+    volumes:
+      - ./tvcharts-server:/server
+
+  react:
+    container_name: react
+    build:
+      context: "tvcharts-client"
+    ports:
+      - 3000:3000
+    depends_on:
+      - api
