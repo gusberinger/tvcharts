@@ -1,3 +1,4 @@
+from ast import dump
 import gzip
 from numpy import full
 import pandas as pd
@@ -9,6 +10,9 @@ from dotenv import dotenv_values
 config = dotenv_values(".env")
 root_path = Path(__file__).parent
 dump_path = root_path.joinpath("dump/")
+if not dump_path.exists():
+    dump_path.mkdir()
+
 db_path = dump_path.joinpath("db.sqlite")
 title_ratings_url = "https://datasets.imdbws.com/title.ratings.tsv.gz"
 title_basics_url = "https://datasets.imdbws.com/title.basics.tsv.gz"
