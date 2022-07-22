@@ -34,7 +34,8 @@ const MovieChart = props => {
   }
 
   useEffect(() => {
-    fetch(`/tconst/${props.tconst}`).then(
+    const url = `/tconst/${props.tconst}`
+    fetch(url).then(
       res => res.json()
     ).then(
       data => {
@@ -52,7 +53,7 @@ const MovieChart = props => {
         title: "Episode Number" ,
         format: 0,
         viewWindow: {min: 1, max: episodeCount}},
-      lineWidth: (props.line == true) ? 3 : 0,
+      lineWidth: (props.line === true) ? 3 : 0,
     }
 
   const ratingOptions = {
@@ -71,7 +72,7 @@ const MovieChart = props => {
   return (
     <>
     {
-      (props.type == "rating") ?
+      (props.type === "rating") ?
         <Chart
           chartType='ScatterChart'
           data={[[
