@@ -40,7 +40,14 @@ const SearchBar = ({placeholder, data, selectItem}) => {
       <div className="dataResult">
         {filteredData.slice(0, 15).map((value, key) => {
           return (
-          <a className="dataItem" target="_blank" onClick={handleSelect} id={value.id} key={key} href="#">
+          <a
+            className="dataItem"
+            target="_blank"
+            onClick={handleSelect}
+            id={value.id}
+            key={key}
+            href="# "
+          >
             <p tconst={value.id}>{value.title} ({value.startYear}–{value.endYear})</p>
           </a>
           )
