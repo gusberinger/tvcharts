@@ -73,12 +73,11 @@ if __name__ == "__main__":
 
     print("Combining episode and rating tables...")
     with engine.connect() as connection:
-        # combine episodes and ratings
         connection.execute(
             "CREATE TABLE episodes AS SELECT a.*, b.numVotes, b.averageRating FROM episodes_index a LEFT JOIN ratings b ON a.tconst=b.tconst;"
         )
-        connection.execute("DROP TABLE episodes_index")
-        connection.execute("DROP TABLE ratings")
+        connection.execute("DROP TABLE episodes_index;")
+        connection.execute("DROP TABLE ratings;")
 
 
     # find all tconst in episodes to avoid extra rows in search table
@@ -102,4 +101,4 @@ if __name__ == "__main__":
                 series_info = series_info[series_info["tconst"].isin(episodes_tconst)]
                 series_info.to_sql(
                     "search", con=engine, if_exists="append", index=False
-                )
+                )        
