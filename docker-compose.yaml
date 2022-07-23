@@ -1,4 +1,4 @@
-version: '3.1'
+version: '3.7'
 
 services:
   api:
@@ -9,6 +9,8 @@ services:
       - 5000:5000
     volumes:
       - ./tvcharts-server:/server
+    environment:
+      THE_MOVIEDB_API_KEY: "${THE_MOVIEDB_API_KEY}"
 
   react:
     container_name: react
