@@ -1,5 +1,5 @@
 from tqdm import tqdm
-from server import app, results
+from server import app, search
 import unittest
 
 class FlaskTestCase(unittest.TestCase):
@@ -10,7 +10,7 @@ class FlaskTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_all(self):
-        tconsts = [x[0] for x in results] 
+        tconsts = [x[0] for x in search] 
         for tconst in tqdm(tconsts):
             tester = app.test_client(self)
             response = tester.get(f"/tconst/{tconst}", content_type = "html/text")
@@ -18,5 +18,5 @@ class FlaskTestCase(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    print(results)
+    print(search)
     unittest.main()
