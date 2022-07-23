@@ -3,10 +3,8 @@ import pandas as pd
 from pathlib import Path
 import requests
 import sqlalchemy as db
-from dotenv import dotenv_values
 from tqdm import tqdm
 
-config = dotenv_values(".env")
 root_path = Path(__file__).parent
 dump_path = root_path.joinpath("dump/")
 if not dump_path.exists():
