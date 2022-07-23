@@ -52,7 +52,7 @@ def get_poster(tconst: str, methods=["GET"]):
         return ""
 
 
-@app.route("/tconst/<tconst>", methods=["GET"])
+@app.route("/episodes/<tconst>", methods=["GET"])
 def get_series(tconst: str) -> dict:
     with engine.connect() as connection:
         results = connection.execute(
