@@ -133,7 +133,7 @@ if __name__ == "__main__":
 
     # load title.basics in chunks into search table
     chunksize = 10**6
-    print("L:oading basics.tsv")
+    print("Loading basics.tsv")
     with gzip.open(dump_path.joinpath("title.basics.tsv.gz"), "rb") as fp:
         with pd.read_csv(
             fp,
