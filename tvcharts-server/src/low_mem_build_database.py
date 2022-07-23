@@ -1,4 +1,3 @@
-from encodings import search_function
 import gzip
 import pandas as pd
 from pathlib import Path
@@ -44,22 +43,6 @@ if __name__ == "__main__":
     download_file(title_basics_url, "title.basics.tsv.gz")
     download_file(title_episodes_url, "title.episodes.tsv.gz")
 
-    # load title.episodes into episodes table
-    chunksize = 10**6
-    with gzip.open(dump_path.joinpath("title.episodes.tsv.gz"), "rb") as fp:
-        with pd.read_csv(
-            fp,
-            sep="\t",
-            usecols=["tconst", "parentTconst", "seasonNumber", "episodeNumber"],
-            na_values="\\N",
-            chunksize=chunksize,
-        ) as reader:
-            for chunk in tqdm(reader, total=6838251 // chunksize):
-                chunk = chunk.dropna(axis=0)
-                chunk.to_sql(
-                    "episodes_index", con=engine, if_exists="append", index=False
-                )
-
     # load title.ratings into ratings table
     with gzip.open(dump_path.joinpath("title.ratings.tsv.gz"), "rb") as fp:
         ratings = pd.read_csv(
@@ -70,19 +53,33 @@ if __name__ == "__main__":
         )
         ratings.to_sql("ratings", con=engine, index=False)
 
-
-    print("Combining episode and rating tables...")
-    with engine.connect() as connection:
-        connection.execute(
-            "CREATE TABLE episodes AS SELECT a.*, b.numVotes, b.averageRating FROM episodes_index a LEFT JOIN ratings b ON a.tconst=b.tconst;"
-        )
-        connection.execute("DROP TABLE episodes_index;")
-        connection.execute("DROP TABLE ratings;")
+    # load title.episodes into episodes table
+    chunksize = 10**3
+    with gzip.open(dump_path.joinpath("title.episodes.tsv.gz"), "rb") as fp:
+        with pd.read_csv(
+            fp,
+            sep="\t",
+            usecols=["tconst", "parentTconst", "seasonNumber", "episodeNumber"],
+            na_values="\\N",
+            chunksize=chunksize,
+            nrows=5*10**3
+        ) as reader:
+            for search_chunk in tqdm(reader, total=6838251 // chunksize):
+                search_chunk = search_chunk.dropna(axis=0)
+                search_chunk = search_chunk.merge(
+                    ratings, how="left", left_on="parentTconst", right_on="tconst", suffixes=('', '_y')
+                )
+                search_chunk = search_chunk.drop("tconst_y", axis=1)
+                search_chunk.to_sql(
+                    "episodes", con=engine, if_exists="append", index=False
+                )
 
 
     # find all tconst in episodes to avoid extra rows in search table
     with engine.connect() as connection:
-        episode_query = connection.execute("SELECT DISTINCT parentTconst FROM episodes").fetchall()
+        episode_query = connection.execute(
+            "SELECT DISTINCT parentTconst FROM episodes"
+        ).fetchall()
         episodes_tconst = {x[0] for x in episode_query}
 
     # load title.basics in chunks into search table
@@ -94,11 +91,15 @@ if __name__ == "__main__":
             usecols=["tconst", "titleType", "primaryTitle", "startYear", "endYear"],
             na_values="\\N",
             chunksize=chunksize,
+            nrows=5*10**3
         ) as reader:
-            for chunk in tqdm(reader, total=9087186 // chunksize):
-                series_info = chunk[chunk["titleType"] == "tvSeries"]
-                series_info = series_info.drop(["titleType"], axis=1)
-                series_info = series_info[series_info["tconst"].isin(episodes_tconst)]
-                series_info.to_sql(
+            for search_chunk in tqdm(reader, total=9087186 // chunksize):
+                search_chunk = search_chunk[search_chunk["titleType"] == "tvSeries"]
+                search_chunk = search_chunk.drop(["titleType"], axis=1)
+                search_chunk = search_chunk[
+                    search_chunk["tconst"].isin(episodes_tconst)
+                ]
+                search_chunk = search_chunk.merge(ratings, how="left", on="tconst")
+                search_chunk.to_sql(
                     "search", con=engine, if_exists="append", index=False
-                )        
+                )
