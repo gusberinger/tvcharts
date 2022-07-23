@@ -56,7 +56,7 @@ def get_poster(tconst: str, methods=["GET"]):
 def get_series(tconst: str) -> dict:
     with engine.connect() as connection:
         results = connection.execute(
-            f"SELECT * FROM episodes WHERE parentTconst='{tconst}'"
+            f"SELECT tconst, parentTconst, seasonNumber, episodeNumber, averageRating, numVotes, primaryTitle FROM episodes WHERE parentTconst='{tconst}'"
         )
         rows = results.fetchall()
     episode_info = defaultdict(lambda: {})

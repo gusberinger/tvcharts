@@ -58,7 +58,7 @@ if __name__ == "__main__":
         )
     episodes = episodes.dropna(axis=0)
     episodes = episodes.merge(ratings, how="left", on="tconst")
-    episodes = episodes.fillna(0)
+    episodes = episodes.dropna(subset=["averageRating", "numVotes"])
     episodes = episodes.sort_values(
         by=["parentTconst", "seasonNumber", "episodeNumber"]
     )
