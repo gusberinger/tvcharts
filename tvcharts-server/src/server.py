@@ -15,14 +15,14 @@ CORS(app)
 
 
 with engine.connect() as connection:
-    results = connection.execute(
-        "SELECT tconst, primaryTitle, startYear, endYear from titles where numVotes > 1000"
+    episodes = connection.execute(
+        "SELECT tconst, primaryTitle, startYear, endYear FROM search where numVotes > 1000"
     ).fetchall()
     titles_search = [
         {"id": tconst, "title": title, "startYear": startYear, "endYear": endYear}
-        for tconst, title, startYear, endYear in results
+        for tconst, title, startYear, endYear in episodes
     ]
-    find_title = dict([(x[0], x[1]) for x in results])
+    find_title = dict([(x[0], x[1]) for x in episodes])
 
 
 @app.route("/search/", methods=["GET"])
@@ -56,30 +56,27 @@ def get_poster(tconst: str, methods=["GET"]):
 def get_series(tconst: str) -> dict:
     with engine.connect() as connection:
         results = connection.execute(
-            f"SELECT * FROM data WHERE parentTconst='{tconst}'"
+            f"SELECT * FROM episodes WHERE parentTconst='{tconst}'"
         )
         rows = results.fetchall()
     episode_info = defaultdict(lambda: {})
     result = {}
-    result["title"] = find_title[tconst]
+    title = find_title[tconst]
+    result["title"] = title
     result["episode_info"] = episode_info
 
     for row in rows:
         (
             tconst,
-            _,
+            _, # parentTconst
             seasonNumber,
             episodeNumber,
-            primaryTitle,
-            startYear,
-            endYear,
             averageRating,
             numVotes,
         ) = row
         seasonNumber = int(seasonNumber)
         episodeNumber = int(episodeNumber)
         result["episode_info"][seasonNumber][episodeNumber] = {
-            "title": primaryTitle,
             "tconst": tconst,
             "rating": averageRating,
             "votes": numVotes,
