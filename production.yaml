@@ -5,6 +5,7 @@ services:
     container_name: api
     build:
       context: "tvcharts-server"
+      dockerfile: Dockerfile.production
     ports:
       - 5000:5000
     volumes:
@@ -16,6 +17,7 @@ services:
     container_name: react
     build:
       context: "tvcharts-client"
+      dockerfile: Dockerfile.production
     ports:
       - 3000:3000
     depends_on:
