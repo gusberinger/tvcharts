@@ -62,7 +62,6 @@ if __name__ == "__main__":
             usecols=["tconst", "parentTconst", "seasonNumber", "episodeNumber"],
             na_values="\\N",
             chunksize=chunksize,
-            nrows=5*10**3
         ) as reader:
             for search_chunk in tqdm(reader, total=6838251 // chunksize):
                 search_chunk = search_chunk.dropna(axis=0)
@@ -91,7 +90,6 @@ if __name__ == "__main__":
             usecols=["tconst", "titleType", "primaryTitle", "startYear", "endYear"],
             na_values="\\N",
             chunksize=chunksize,
-            nrows=5*10**3
         ) as reader:
             for search_chunk in tqdm(reader, total=9087186 // chunksize):
                 search_chunk = search_chunk[search_chunk["titleType"] == "tvSeries"]
