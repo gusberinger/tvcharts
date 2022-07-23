@@ -20,10 +20,10 @@ const MovieChart = props => {
         for (const episodeNumber of Object.keys(episode_info[seasonNumber])) {
           const episode = episode_info[seasonNumber][episodeNumber]
           episodeIndex++
-          const title = episode['title']
           const rating = episode['rating']
           const votes = episode['votes']
-          const annotation = `<b>Season ${seasonNumber} Epsiode ${episodeNumber}</b><br/>${title}<br/>${votes.toLocaleString('en-US')} Votes<br/>${rating} Average Rating`
+          const episodeTitle = episode['episodeTitle']
+          const annotation = `<b>Season ${seasonNumber} Epsiode ${episodeNumber}</b><br/>${episodeTitle}<br/>${votes.toLocaleString('en-US')} Votes<br/>${rating} Average Rating`
           ratingRows.push([episodeIndex, rating, annotation, seasonColor])
           voteRows.push([episodeIndex, votes, annotation, seasonColor])
         }
