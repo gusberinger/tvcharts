@@ -48,7 +48,7 @@ const SearchBar = ({placeholder, data, selectItem}) => {
             key={key}
             href="# "
           >
-            <p tconst={value.id}>{value.title} ({value.startYear}–{value.endYear})</p>
+            <p tconst={value.tconst}>{value.title} ({value.startYear}–{value.endYear})</p>
           </a>
           )
         })}
