@@ -51,6 +51,7 @@ if __name__ == "__main__":
             usecols=["tconst", "averageRating", "numVotes"],
             na_values="\\N",
         )
+        ratings = ratings.fillna(0)
         ratings.to_sql("ratings", con=engine, index=False)
 
     # load title.episodes into episodes table
