@@ -54,7 +54,7 @@ if __name__ == "__main__":
         ratings.to_sql("ratings", con=engine, index=False)
 
     # load title.episodes into episodes table
-    chunksize = 10**3
+    chunksize = 10**6
     with gzip.open(dump_path.joinpath("title.episodes.tsv.gz"), "rb") as fp:
         with pd.read_csv(
             fp,
