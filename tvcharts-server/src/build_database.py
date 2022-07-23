@@ -32,7 +32,6 @@ if __name__ == "__main__":
 
     with engine.connect() as connection:
         connection.execute("DROP TABLE IF EXISTS episodes;")
-        connection.execute("DROP TABLE IF EXISTS episodes_index;")
         connection.execute("DROP TABLE IF EXISTS search;")
         connection.execute("DROP TABLE IF EXISTS ratings;")
 
@@ -102,3 +101,5 @@ if __name__ == "__main__":
                 search_chunk.to_sql(
                     "search", con=engine, if_exists="append", index=False
                 )
+    with engine.connect() as connection:
+        connection.execute("DROP TABLE ratings;")
