@@ -15,21 +15,21 @@ CORS(app)
 
 
 with engine.connect() as connection:
-    episodes = connection.execute(
+    search = connection.execute(
         "SELECT tconst, primaryTitle, startYear, endYear FROM search where numVotes > 1000"
     ).fetchall()
-    titles_search = [
-        {"id": tconst, "title": title, "startYear": startYear, "endYear": endYear}
-        for tconst, title, startYear, endYear in episodes
+    search_json = [
+        {"tconst": tconst, "title": title, "startYear": startYear, "endYear": endYear}
+        for tconst, title, startYear, endYear in search
     ]
-    find_title = dict([(x[0], x[1]) for x in episodes])
+    find_title = dict([(x["tconst"], x["title"]) for x in search_json])
 
 
 @app.route("/search/", methods=["GET"])
 def get_search():
-    title_json = jsonify(titles_search)
-    title_json.headers.add('Access-Control-Allow-Origin', '*')
-    return title_json
+    search_jsonify = jsonify(search_json)
+    search_jsonify.headers.add('Access-Control-Allow-Origin', '*')
+    return search_jsonify
 
 
 @app.route("/poster/<tconst>")
@@ -73,11 +73,13 @@ def get_series(tconst: str) -> dict:
             episodeNumber,
             averageRating,
             numVotes,
+            primaryTitle
         ) = row
         seasonNumber = int(seasonNumber)
         episodeNumber = int(episodeNumber)
         result["episode_info"][seasonNumber][episodeNumber] = {
             "tconst": tconst,
+            "episodeTitle": primaryTitle,
             "rating": averageRating,
             "votes": numVotes,
         }

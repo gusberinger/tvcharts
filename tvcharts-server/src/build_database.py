@@ -1,4 +1,5 @@
 import gzip
+from socket import if_indextoname
 import pandas as pd
 from pathlib import Path
 import requests
@@ -31,9 +32,57 @@ if __name__ == "__main__":
     engine = db.create_engine(f"sqlite:///{db_path}")
 
     with engine.connect() as connection:
+        connection.execute("DROP TABLE IF EXISTS episode_titles;")
+        connection.execute("DROP TABLE IF EXISTS ratings;")
         connection.execute("DROP TABLE IF EXISTS episodes;")
         connection.execute("DROP TABLE IF EXISTS search;")
-        connection.execute("DROP TABLE IF EXISTS ratings;")
+
+        # cannot specify primary key using pd.Dataframe.to_sql
+        # cannot add primary key after table created
+        # so we manually create table schema with primary key
+        connection.execute(
+        """
+        CREATE TABLE episode_titles (
+            tconst TEXT PRIMARY KEY,
+            "primaryTitle" TEXT,
+            "startYear" INT,
+            "endYear" INT
+        );"""
+        )
+
+        connection.execute(
+        """
+        CREATE TABLE ratings (
+            tconst TEXT PRIMARY KEY,
+            "averageRating" FLOAT,
+            "numVotes" BIGINT
+        );"""
+        )
+
+        # connection.execute(
+        # """
+        # CREATE TABLE episodes (
+        #     tconst TEXT PRIMARY KEY,
+        #     "parentTconst" TEXT,
+        #     "seasonNumber" INT,
+        #     "episodeNumber" INT,
+        #     "averageRating" FLOAT,
+        #     "numVotes" INT
+        # );"""
+        # )
+
+        connection.execute(
+        """
+        CREATE TABLE search (
+            tconst TEXT PRIMARY KEY,
+            "primaryTitle" TEXT,
+            "startYear" INT,
+            "endYear" INT,
+            "averageRating" FLOAT,
+            "numVotes" INT
+        );"""
+        )
+
 
     if not dump_path.is_dir():
         dump_path.mkdir()
@@ -43,6 +92,8 @@ if __name__ == "__main__":
     download_file(title_episodes_url, "title.episodes.tsv.gz")
 
     # load title.ratings into ratings table
+    # table is small enough that we don't chunk
+    print("Loading ratings.tsv")
     with gzip.open(dump_path.joinpath("title.ratings.tsv.gz"), "rb") as fp:
         ratings = pd.read_csv(
             fp,
@@ -50,11 +101,11 @@ if __name__ == "__main__":
             usecols=["tconst", "averageRating", "numVotes"],
             na_values="\\N",
         )
-        ratings = ratings.fillna(0)
-        ratings.to_sql("ratings", con=engine, index=False)
+        # ratings.to_sql("ratings", con=engine, index=False, if_exists="append")
 
     # load title.episodes into episodes table
     chunksize = 10**6
+    print("loading episodes.tsv")
     with gzip.open(dump_path.joinpath("title.episodes.tsv.gz"), "rb") as fp:
         with pd.read_csv(
             fp,
@@ -63,26 +114,27 @@ if __name__ == "__main__":
             na_values="\\N",
             chunksize=chunksize,
         ) as reader:
-            for search_chunk in tqdm(reader, total=6838251 // chunksize):
-                search_chunk = search_chunk.dropna(axis=0)
-                search_chunk = search_chunk.merge(
-                    ratings, how="left", left_on="parentTconst", right_on="tconst", suffixes=('', '_y')
+            for episode_chunk in tqdm(reader, total=6838251 // chunksize):
+                episode_chunk = episode_chunk.dropna(axis=0)
+                episode_chunk = episode_chunk.merge(
+                    ratings, how="left", on="tconst"
                 )
-                search_chunk = search_chunk.drop("tconst_y", axis=1)
-                search_chunk.to_sql(
-                    "episodes", con=engine, if_exists="append", index=False
+                episode_chunk.fillna(0) # fill in tconsts with no rating
+                episode_chunk.to_sql(
+                    "episodes_rating", con=engine, if_exists="append", index=False
                 )
 
 
     # find all tconst in episodes to avoid extra rows in search table
     with engine.connect() as connection:
         episode_query = connection.execute(
-            "SELECT DISTINCT parentTconst FROM episodes"
+            "SELECT DISTINCT parentTconst FROM episodes_rating"
         ).fetchall()
-        episodes_tconst = {x[0] for x in episode_query}
+        episodes_parentTconst = {x[0] for x in episode_query}
 
     # load title.basics in chunks into search table
     chunksize = 10**6
+    print("L:oading basics.tsv")
     with gzip.open(dump_path.joinpath("title.basics.tsv.gz"), "rb") as fp:
         with pd.read_csv(
             fp,
@@ -91,15 +143,30 @@ if __name__ == "__main__":
             na_values="\\N",
             chunksize=chunksize,
         ) as reader:
-            for search_chunk in tqdm(reader, total=9087186 // chunksize):
-                search_chunk = search_chunk[search_chunk["titleType"] == "tvSeries"]
-                search_chunk = search_chunk.drop(["titleType"], axis=1)
-                search_chunk = search_chunk[
-                    search_chunk["tconst"].isin(episodes_tconst)
+            for basics_chunk in tqdm(reader, total=9087186 // chunksize):
+                episode_chunk = basics_chunk[basics_chunk["titleType"] == "tvEpisode"]
+                episode_chunk = episode_chunk.drop(["titleType"], axis=1)
+                episode_chunk.to_sql("episode_titles", con=engine, if_exists="append", index=False)
+                del episode_chunk
+                
+
+                series_chunk = basics_chunk[basics_chunk["titleType"] == "tvSeries"]
+                series_chunk = series_chunk.drop(["titleType"], axis=1)
+                series_chunk = series_chunk[
+                    series_chunk["tconst"].isin(episodes_parentTconst)
                 ]
-                search_chunk = search_chunk.merge(ratings, how="left", on="tconst")
-                search_chunk.to_sql(
+                series_chunk = series_chunk.merge(ratings, how="left", on="tconst")
+                series_chunk.to_sql(
                     "search", con=engine, if_exists="append", index=False
                 )
+                del series_chunk
+
+    print("Merging episodes with titles...")
     with engine.connect() as connection:
-        connection.execute("DROP TABLE ratings;")
+        connection.execute("""
+        CREATE TABLE episodes AS SELECT 
+        a.*, b.primaryTitle 
+        FROM episodes_rating a LEFT JOIN episode_titles b
+        ON a.tconst=b.tconst;"""
+        )
+        connection.execute("DROP TABLE episodes_rating;")
