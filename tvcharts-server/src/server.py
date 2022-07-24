@@ -59,11 +59,20 @@ def get_episodes(tconst: str) -> dict:
         episode_query = connection.execute(
             f"SELECT tconst, parentTconst, seasonNumber, episodeNumber, cumEpisodeNumber, averageRating, numVotes, primaryTitle FROM episodes WHERE parentTconst='{tconst}'"
         ).fetchall()
-
-    colors = ["#8dd3c7", "#bebada", "#fb8072", "#80b1d3", "#fdb462", "#b3de69", "#fccde5", "#d9d9d9"]
+    title = find_title[tconst]
+    colors = [
+        "#8dd3c7",
+        "#bebada",
+        "#fb8072",
+        "#80b1d3",
+        "#fdb462",
+        "#b3de69",
+        "#fccde5",
+        "#d9d9d9",
+    ]
     template = []
-    averageRating_rows = []
-    numVotes_rows = []
+    rating_rows = []
+    vote_rows = []
     for (
         tconst,
         _,
@@ -76,17 +85,18 @@ def get_episodes(tconst: str) -> dict:
     ) in episode_query:
         annotation = f"""<b>Season {seasonNumber} Epsiode {episodeNumber}</b><br/><a href={f'https://www.imdb.com/title/{tconst}'}>{primaryTitle}<a/><br/>{numVotes:,} Votes<br/>{averageRating:.1f} Average Rating<br/>"""
 
-        averageRating_rows.append(averageRating)
-        numVotes_rows.append(numVotes)
-        template.append(
-            [
-                cumEpisodeNumber,
-                0,
-                annotation,
-                colors[(seasonNumber - 1) % len(colors)]
-            ]
-        )
-        json = {"template": template, "numVotes": numVotes_rows, "averageRating": averageRating_rows}
+
+        rating_row = [cumEpisodeNumber, averageRating, annotation, colors[(seasonNumber - 1) % len(colors)]]
+        vote_row = rating_row.copy()
+        vote_row[1] = numVotes
+        rating_rows.append(rating_row)
+        vote_rows.append(vote_row)
+
+        json = {
+            "numVotes": vote_rows,
+            "averageRating": rating_rows,
+            "title": title
+        }
         json = jsonify(json)
         json.headers.add("Access-Control-Allow-Origin", "*")
     return json
