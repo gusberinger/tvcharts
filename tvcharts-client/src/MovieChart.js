@@ -12,7 +12,7 @@ const MovieChart = props => {
     setTitle(data["title"])
     setVoteRows(data["numVotes"])
     setRatingRows(data["averageRating"])
-    setEpisodeCount(data["numVotes"].length)
+    setEpisodeCount(data["numVotes"].length + 1)
   }
 
   useEffect(() => {
@@ -36,6 +36,8 @@ const MovieChart = props => {
         format: 0,
         viewWindow: {min: 1, max: episodeCount}},
       lineWidth: (props.line === true) ? 3 : 0,
+      // trendlines: { 0: {} },
+      // explorer: {axis: 'horizontal', keepInBounds: true, maxZoomOut: 1}
     }
 
   const ratingOptions = {
