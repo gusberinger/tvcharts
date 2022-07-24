@@ -54,13 +54,12 @@ if __name__ == "__main__":
             usecols=["tconst", "parentTconst", "seasonNumber", "episodeNumber"],
             na_values="\\N",
         )
-    episodes = episodes.dropna(axis=0)
     episodes = episodes.merge(ratings, how="left", on="tconst")
-    episodes = episodes.dropna(subset=["averageRating", "numVotes"])
     episodes = episodes.sort_values(
         by=["parentTconst", "seasonNumber", "episodeNumber"]
     )
-
+    episodes["cumEpisodeNumber"] = episodes.groupby(["parentTconst"]).cumcount() + 1
+    episodes = episodes.dropna(subset=["averageRating", "numVotes"])
     episodes_parentTconst = set(episodes["parentTconst"])
 
     print("Loading basics.tsv ...")
