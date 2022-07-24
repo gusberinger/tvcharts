@@ -35,6 +35,7 @@ const App = () => {
 
   const selectItem = e => {
     const newShow = e.target.getAttribute("tconst")
+    const newTitle = e.target.getAttribute("title")
     setShow(newShow)
   }
 
@@ -42,9 +43,8 @@ const App = () => {
     <>
       <section>
         <h1 className='site-title center-text'>TV Charts</h1>
-        <div className='container'>
+        <div class="split">
           <img src={`http://localhost:5000/poster/${show}`} alt=""/>
-          <SearchBar placeholder="Search TV Show" data={searchData} selectItem={selectItem}/>
           <div className="chartOptions">
             <button onClick={() => setLines(!lines)}>{lines ? "Hide Lines" : "Show Lines"}</button>
             <button onClick={() => (type === "rating") ? setType("votes") : setType("rating")}>{(type === "rating") ? 'Rating' : 'Votes'}</button>
@@ -56,6 +56,11 @@ const App = () => {
         </div>
       </section>
       <section>
+        <div class="search-bar">
+          <SearchBar placeholder="Search TV Show" data={searchData} selectItem={selectItem}/>
+        </div>
+      {/* </section> */}
+      {/* <section> */}
         <div>
           <MovieChart
             tconst={show}
