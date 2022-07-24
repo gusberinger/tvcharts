@@ -44,6 +44,7 @@ const App = () => {
         <h1 className='site-title center-text'>TV Charts</h1>
         <div className='container'>
           <img src={`http://localhost:5000/poster/${show}`} alt=""/>
+          <SearchBar placeholder="Search TV Show" data={searchData} selectItem={selectItem}/>
           <div className="chartOptions">
             <button onClick={() => setLines(!lines)}>{lines ? "Hide Lines" : "Show Lines"}</button>
             <button onClick={() => (type === "rating") ? setType("votes") : setType("rating")}>{(type === "rating") ? 'Rating' : 'Votes'}</button>
@@ -52,7 +53,6 @@ const App = () => {
             : <></>}
             <button onClick={() => setColors(!colors)}>{colors ? "Hide Colors" : "Show Colors"}</button>
           </div>
-          <SearchBar placeholder="Search TV Show" data={searchData} selectItem={selectItem}/>
         </div>
       </section>
       <section>
