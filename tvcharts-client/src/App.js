@@ -43,7 +43,7 @@ const App = () => {
     <>
       <section>
         <h1 className='site-title center-text'>TV Charts</h1>
-        <div class="split">
+        <div className="split">
           <img src={`http://localhost:5000/poster/${show}`} alt=""/>
           <div className="chartOptions">
             <button onClick={() => setLines(!lines)}>{lines ? "Hide Lines" : "Show Lines"}</button>
@@ -56,7 +56,7 @@ const App = () => {
         </div>
       </section>
       <section>
-        <div class="search-bar">
+        <div className="search-bar">
           <SearchBar placeholder="Search TV Show" data={searchData} selectItem={selectItem}/>
         </div>
       {/* </section> */}
