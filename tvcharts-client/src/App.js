@@ -17,7 +17,7 @@ const topShows = [
 const App = () => {
   const [type, setType] = useState("rating")
   const [lines, setLines] = useState(true)
-  const [scaleY, setScaleY] = useState(false)
+  const [scaleY, setScaleY] = useState(true)
   const [colors, setColors] = useState(true)
   const [show, setShow] = useState(topShows[Math.floor(Math.random()*topShows.length)])
   const [searchData, setSearchData] = useState([{}])
