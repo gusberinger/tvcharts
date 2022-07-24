@@ -70,7 +70,6 @@ def get_episodes(tconst: str) -> dict:
         "#fccde5",
         "#d9d9d9",
     ]
-    template = []
     rating_rows = []
     vote_rows = []
     for (
