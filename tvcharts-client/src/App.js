@@ -5,7 +5,6 @@ import './App.css'
 
 
 const topShows = [
-  "tt2297757",
   "tt0141842",
   "tt0903747",
   "tt0386676",
