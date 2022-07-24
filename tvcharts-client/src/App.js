@@ -35,7 +35,6 @@ const App = () => {
 
   const selectItem = e => {
     const newShow = e.target.getAttribute("tconst")
-    const newTitle = e.target.getAttribute("title")
     setShow(newShow)
   }
 
