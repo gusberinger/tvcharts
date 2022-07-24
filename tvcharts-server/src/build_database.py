@@ -54,6 +54,7 @@ if __name__ == "__main__":
             usecols=["tconst", "parentTconst", "seasonNumber", "episodeNumber"],
             na_values="\\N",
         )
+    episodes = episodes.dropna(subset = ["seasonNumber", "episodeNumber"])
     episodes = episodes.merge(ratings, how="left", on="tconst")
     episodes = episodes.sort_values(
         by=["parentTconst", "seasonNumber", "episodeNumber"]
