@@ -35,36 +35,37 @@ const App = () => {
 
   const selectItem = e => {
     const newShow = e.target.getAttribute("tconst")
-    console.log(newShow)
     setShow(newShow)
   }
 
   return (
     <>
       <section>
-      <h1 className='site-title center-text'>TV Charts</h1>
-      <div className='hero'>
-
-        <img src={`http://localhost:5000/poster/${show}`} alt=""/>
-        <div className="selectMovie">
-          <button onClick={() => setLines(!lines)}>{lines ? "Hide Lines" : "Show Lines"}</button>
-          <button onClick={() => (type === "rating") ? setType("votes") : setType("rating")}>{(type === "rating") ? 'Rating' : 'Votes'}</button>
-          {(type === "rating") ? 
-          <button onClick={() => setScaleY(!scaleY)}>{scaleY ? "Scale Y-Axis" : "Unscale Y-Axis"}</button>
-          : <></>}
-          <button onClick={() => setColors(!colors)}>{colors ? "Hide Colors" : "Show Colors"}</button>
+        <h1 className='site-title center-text'>TV Charts</h1>
+        <div className='container'>
+          <img src={`http://localhost:5000/poster/${show}`} alt=""/>
+          <div className="chartOptions">
+            <button onClick={() => setLines(!lines)}>{lines ? "Hide Lines" : "Show Lines"}</button>
+            <button onClick={() => (type === "rating") ? setType("votes") : setType("rating")}>{(type === "rating") ? 'Rating' : 'Votes'}</button>
+            {(type === "rating") ? 
+            <button onClick={() => setScaleY(!scaleY)}>{scaleY ? "Scale Y-Axis" : "Unscale Y-Axis"}</button>
+            : <></>}
+            <button onClick={() => setColors(!colors)}>{colors ? "Hide Colors" : "Show Colors"}</button>
+          </div>
+          <SearchBar placeholder="Search TV Show" data={searchData} selectItem={selectItem}/>
         </div>
-        <SearchBar placeholder="Search TV Show" data={searchData} selectItem={selectItem}/>
-      </div>
       </section>
-      <div><MovieChart
-        tconst={show}
-        type={type}
-        line={lines}
-        scaleY={scaleY}
-        showColors = {colors}
-      />
-      </div>
+      <section>
+        <div>
+          <MovieChart
+            tconst={show}
+            type={type}
+            line={lines}
+            scaleY={scaleY}
+            showColors = {colors}
+            />
+        </div>
+      </section>
     </>
   )
 }
