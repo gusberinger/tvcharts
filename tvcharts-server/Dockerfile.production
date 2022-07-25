@@ -5,5 +5,4 @@ COPY requirements.txt .
 COPY src/dump/db.sqlite src/dump/db.sqlite
 COPY src/server.py src/server.py
 RUN pip install -r requirements.txt
-CMD ["python", "src/server.py"]
 CMD ["gunicorn", "-w", "2", "-b", "0.0.0.0:5000", "--chdir", "src/", "server:app"]
