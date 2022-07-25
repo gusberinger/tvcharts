@@ -1,12 +1,12 @@
 from pathlib import Path
-from re import template
+from dotenv import load_dotenv
 import requests
 import sqlalchemy as db
-from collections import defaultdict
 import os
 from flask import Flask, jsonify, make_response
 from flask_cors import CORS
 
+load_dotenv()
 root_path = Path(__file__).parent
 dump_path = root_path.joinpath("dump/")
 db_path = dump_path.joinpath("db.sqlite")
