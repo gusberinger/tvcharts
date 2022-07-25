@@ -11,6 +11,8 @@ services:
       - ./tvcharts-server:/server
     environment:
       THE_MOVIEDB_API_KEY: "${THE_MOVIEDB_API_KEY}"
+      FLASK_APP: "src/server.py"
+      FLASK_ENV: "development"
 
   react:
     container_name: react
