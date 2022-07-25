@@ -1,4 +1,5 @@
 from pathlib import Path
+from re import template
 import requests
 import sqlalchemy as db
 from collections import defaultdict
@@ -28,7 +29,7 @@ with engine.connect() as connection:
 @app.route("/search/", methods=["GET"])
 def get_search():
     search_jsonify = jsonify(search_json)
-    search_jsonify.headers.add('Access-Control-Allow-Origin', '*')
+    search_jsonify.headers.add("Access-Control-Allow-Origin", "*")
     return search_jsonify
 
 
@@ -46,45 +47,57 @@ def get_poster(tconst: str, methods=["GET"]):
         response.headers.set(
             "Content-Disposition", "attachment", filename=f"{tconst}.jpg"
         )
-        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add("Access-Control-Allow-Origin", "*")
         return response
     else:
         return ""
 
 
 @app.route("/episodes/<tconst>", methods=["GET"])
-def get_series(tconst: str) -> dict:
+def get_episodes(tconst: str) -> dict:
     with engine.connect() as connection:
-        results = connection.execute(
-            f"SELECT tconst, parentTconst, seasonNumber, episodeNumber, averageRating, numVotes, primaryTitle FROM episodes WHERE parentTconst='{tconst}'"
-        )
-        rows = results.fetchall()
-    episode_info = defaultdict(lambda: {})
-    result = {}
+        episode_query = connection.execute(
+            f"SELECT tconst, parentTconst, seasonNumber, episodeNumber, cumEpisodeNumber, averageRating, numVotes, primaryTitle FROM episodes WHERE parentTconst='{tconst}'"
+        ).fetchall()
     title = find_title[tconst]
-    result["title"] = title
-    result["episode_info"] = episode_info
+    colors = [
+        "#8dd3c7",
+        "#bebada",
+        "#fb8072",
+        "#80b1d3",
+        "#fdb462",
+        "#b3de69",
+        "#fccde5",
+        "#d9d9d9",
+    ]
+    rating_rows = []
+    vote_rows = []
+    for (
+        tconst,
+        _,
+        seasonNumber,
+        episodeNumber,
+        cumEpisodeNumber,
+        averageRating,
+        numVotes,
+        primaryTitle,
+    ) in episode_query:
+        annotation = f"""<b>Season {seasonNumber} Epsiode {episodeNumber}</b><br/><a href={f'https://www.imdb.com/title/{tconst}'}>{primaryTitle}<a/><br/>{numVotes:,} Votes<br/>{averageRating:.1f} Average Rating<br/>"""
 
-    for row in rows:
-        (
-            tconst,
-            _, # parentTconst
-            seasonNumber,
-            episodeNumber,
-            averageRating,
-            numVotes,
-            primaryTitle
-        ) = row
-        seasonNumber = int(seasonNumber)
-        episodeNumber = int(episodeNumber)
-        result["episode_info"][seasonNumber][episodeNumber] = {
-            "tconst": tconst,
-            "episodeTitle": primaryTitle,
-            "rating": averageRating,
-            "votes": numVotes,
+
+        rating_row = [cumEpisodeNumber, averageRating, annotation, colors[(seasonNumber - 1) % len(colors)]]
+        vote_row = rating_row.copy()
+        vote_row[1] = numVotes
+        rating_rows.append(rating_row)
+        vote_rows.append(vote_row)
+
+        json = {
+            "numVotes": vote_rows,
+            "averageRating": rating_rows,
+            "title": title
         }
-    json = jsonify(result)
-    json.headers.add("Access-Control-Allow-Origin", "*")
+        json = jsonify(json)
+        json.headers.add("Access-Control-Allow-Origin", "*")
     return json
 
 

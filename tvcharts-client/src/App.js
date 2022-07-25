@@ -5,7 +5,6 @@ import './App.css'
 
 
 const topShows = [
-  "tt2297757",
   "tt0141842",
   "tt0903747",
   "tt0386676",
@@ -17,7 +16,7 @@ const topShows = [
 const App = () => {
   const [type, setType] = useState("rating")
   const [lines, setLines] = useState(true)
-  const [scaleY, setScaleY] = useState(false)
+  const [scaleY, setScaleY] = useState(true)
   const [colors, setColors] = useState(true)
   const [show, setShow] = useState(topShows[Math.floor(Math.random()*topShows.length)])
   const [searchData, setSearchData] = useState([{}])
@@ -36,36 +35,41 @@ const App = () => {
 
   const selectItem = e => {
     const newShow = e.target.getAttribute("tconst")
-    console.log(newShow)
     setShow(newShow)
   }
 
   return (
     <>
       <section>
-      <h1 className='site-title center-text'>TV Charts</h1>
-      <div className='hero'>
-
-        <img src={`http://localhost:5000/poster/${show}`} alt=""/>
-        <div className="selectMovie">
-          <button onClick={() => setLines(!lines)}>{lines ? "Hide Lines" : "Show Lines"}</button>
-          <button onClick={() => (type === "rating") ? setType("votes") : setType("rating")}>{(type === "rating") ? 'Rating' : 'Votes'}</button>
-          {(type === "rating") ? 
-          <button onClick={() => setScaleY(!scaleY)}>{scaleY ? "Scale Y-Axis" : "Unscale Y-Axis"}</button>
-          : <></>}
-          <button onClick={() => setColors(!colors)}>{colors ? "Hide Colors" : "Show Colors"}</button>
+        <h1 className='site-title center-text'>TV Charts</h1>
+        <div className="split">
+          <img src={`http://localhost:5000/poster/${show}`} alt=""/>
+          <div className="chartOptions">
+            <button onClick={() => setLines(!lines)}>{lines ? "Hide Lines" : "Show Lines"}</button>
+            <button onClick={() => (type === "rating") ? setType("votes") : setType("rating")}>{(type === "rating") ? 'Rating' : 'Votes'}</button>
+            {(type === "rating") ? 
+            <button onClick={() => setScaleY(!scaleY)}>{scaleY ? "Scale Y-Axis" : "Unscale Y-Axis"}</button>
+            : <></>}
+            <button onClick={() => setColors(!colors)}>{colors ? "Hide Colors" : "Show Colors"}</button>
+          </div>
         </div>
-        <SearchBar placeholder="Search TV Show" data={searchData} selectItem={selectItem}/>
-      </div>
       </section>
-      <div><MovieChart
-        tconst={show}
-        type={type}
-        line={lines}
-        scaleY={scaleY}
-        showColors = {colors}
-      />
-      </div>
+      <section>
+        <div className="search-bar">
+          <SearchBar placeholder="Search TV Show" data={searchData} selectItem={selectItem}/>
+        </div>
+      {/* </section> */}
+      {/* <section> */}
+        <div>
+          <MovieChart
+            tconst={show}
+            type={type}
+            line={lines}
+            scaleY={scaleY}
+            showColors = {colors}
+            />
+        </div>
+      </section>
     </>
   )
 }
