@@ -37,7 +37,6 @@ def get_search():
 def get_poster(tconst: str, methods=["GET"]):
     api_key = os.environ.get("THE_MOVIEDB_API_KEY")
     url = f"https://api.themoviedb.org/3/find/{tconst}?api_key={api_key}&language=en-US&external_source=imdb_id"
-    print(url)
     tmdb_response = requests.get(url)
     if tmdb_response.ok:
         poster_path = tmdb_response.json()["tv_results"][0]["poster_path"]
