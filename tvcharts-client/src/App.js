@@ -49,10 +49,10 @@ const App = () => {
             <button onClick={() => setLines(!lines)}>{lines ? "Hide Lines" : "Show Lines"}</button>
             <button onClick={() => (type === "rating") ? setType("votes") : setType("rating")}>{(type === "rating") ? 'Rating' : 'Votes'}</button>
             {(type === "rating") ? 
-            <button onClick={() => setScaleY(!scaleY)}>{scaleY ? "Scale Y-Axis" : "Unscale Y-Axis"}</button>
+            <button onClick={() => setScaleY(!scaleY)}>{scaleY ? "Complete Y-Axis" : "Limit Y-Axis"}</button>
             : <></>}
             <button onClick={() => setColors(!colors)}>{colors ? "Hide Colors" : "Show Colors"}</button>
-            <button onClick={() => setLogScale(!logScale)}>Use Log Scale</button>
+            <button onClick={() => setLogScale(!logScale)}>{logScale ? "Log Scale" : "Linear Scale"}</button>
           </div>
         </div>
       </section>
