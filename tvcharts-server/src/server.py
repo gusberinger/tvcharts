@@ -37,6 +37,7 @@ def get_search():
 def get_poster(tconst: str, methods=["GET"]):
     api_key = os.environ.get("THE_MOVIEDB_API_KEY")
     url = f"https://api.themoviedb.org/3/find/{tconst}?api_key={api_key}&language=en-US&external_source=imdb_id"
+    print(url)
     tmdb_response = requests.get(url)
     if tmdb_response.ok:
         poster_path = tmdb_response.json()["tv_results"][0]["poster_path"]
@@ -100,6 +101,17 @@ def get_episodes(tconst: str) -> dict:
         json.headers.add("Access-Control-Allow-Origin", "*")
     return json
 
+@app.route("/season/<tconst>", methods=["GET"])
+def get_season(tconst: str):
+    with engine.connect() as connection:
+        season_query = connection.execute(
+            f"SELECT seasonNumber, averageRating, numVotes FROM seasons WHERE parentTconst='{tconst}'"
+        ).fetchall()
+    data = [[season_number, rating, vote] for season_number, rating, vote in season_query]
+    json = {"data": data}
+    json = jsonify(data)
+    json.headers.add("Access-Control-Allow-Origin", "*")
+    return json
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
