@@ -11,6 +11,13 @@ const topShows = [
   "tt0098904",
   "tt0108778",
 ]
+const topShowsTitles = [
+  "The Sopranos",
+  "Breaking Bad",
+  "The Office",
+  "Seinfeld",
+  "Friends"
+]
 
 
 const App = () => {
@@ -19,7 +26,9 @@ const App = () => {
   const [scaleY, setScaleY] = useState(true)
   const [colors, setColors] = useState(true)
   const [logScale, setLogScale] = useState(false)
-  const [show, setShow] = useState(topShows[Math.floor(Math.random()*topShows.length)])
+  const n = Math.floor(Math.random()*topShows.length)
+  const [show, setShow] = useState(topShows[n])
+  const [title, setTitle] = useState(topShowsTitles[n])
   const [searchData, setSearchData] = useState([{}])
 
   useEffect(() => {
@@ -36,13 +45,18 @@ const App = () => {
 
   const selectItem = e => {
     const newShow = e.target.getAttribute("tconst")
+    const newTitle = e.target.getAttribute("title")
+    console.log(e.target)
+    console.log(newTitle)
     setShow(newShow)
+    setTitle(newTitle)
   }
 
   return (
     <>
       <section>
         <h1 className='site-title center-text'>TV Charts</h1>
+        <h2 className='site-subtitle center-text'>{title}</h2>
         <div className="split">
           <img src={`http://localhost:5000/poster/${show}`} alt=""/>
           <div className="chartOptions">

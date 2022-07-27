@@ -50,7 +50,7 @@ const SearchBar = ({placeholder, data, selectItem}) => {
             key={index}
             href="# "
           >
-            <p tconst={value.item.tconst}>{value.item.title} ({value.item.startYear}–{value.item.endYear})</p>
+            <p tconst={value.item.tconst} title={value.item.title}>{value.item.title} ({value.item.startYear}–{value.item.endYear})</p>
           </a>
           )
         })}
