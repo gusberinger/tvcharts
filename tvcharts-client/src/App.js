@@ -18,6 +18,7 @@ const App = () => {
   const [lines, setLines] = useState(true)
   const [scaleY, setScaleY] = useState(true)
   const [colors, setColors] = useState(true)
+  const [logScale, setLogScale] = useState(false)
   const [show, setShow] = useState(topShows[Math.floor(Math.random()*topShows.length)])
   const [searchData, setSearchData] = useState([{}])
 
@@ -51,6 +52,7 @@ const App = () => {
             <button onClick={() => setScaleY(!scaleY)}>{scaleY ? "Scale Y-Axis" : "Unscale Y-Axis"}</button>
             : <></>}
             <button onClick={() => setColors(!colors)}>{colors ? "Hide Colors" : "Show Colors"}</button>
+            <button onClick={() => setLogScale(!logScale)}>Use Log Scale</button>
           </div>
         </div>
       </section>
@@ -66,6 +68,7 @@ const App = () => {
             type={type}
             line={lines}
             scaleY={scaleY}
+            logScale={logScale}
             showColors = {colors}
             />
         </div>

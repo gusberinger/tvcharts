@@ -44,14 +44,18 @@ const MovieChart = props => {
   const ratingOptions = {
     ...optionsTemplate,
     title:  `IMDB Average Rating - ${title}`,
-    vAxis: { title: "Average Rating", viewWindow: (props.scaleY) ? {min: 0, max: 10} : {}},
+    vAxis: { 
+      title: "Average Rating",
+      viewWindow: (props.scaleY) ? {min: 0, max: 10} : {},
+      scaleType: (props.logScale) ? "log" : "linear"
+    },
     width_units: '%'
   }
 
   const votesOptions = {
     ...optionsTemplate,
     title: `IMDB Votes - ${title}`,
-    vAxis: { title: "Number of Votes" },
+    vAxis: { title: "Number of Votes", scaleType: (props.logScale) ? "log" : "linear" },
   }
 
   return (
