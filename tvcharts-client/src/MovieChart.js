@@ -12,7 +12,8 @@ const MovieChart = props => {
     setTitle(data["title"])
     setVoteRows(data["numVotes"])
     setRatingRows(data["averageRating"])
-    setEpisodeCount(data["numVotes"].length + 1)
+    const n = data["numVotes"].length - 1
+    setEpisodeCount(data["numVotes"][n][0])
   }
 
   useEffect(() => {
