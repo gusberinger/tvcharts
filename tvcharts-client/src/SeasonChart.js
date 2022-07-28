@@ -3,7 +3,7 @@ import { useEffect } from 'react'
 import { useState } from 'react'
 import Chart from 'react-google-charts'
 
-const SeasonChart = ({tconst, type, title, logScale, scaleY, line}) => {
+const SeasonChart = ({tconst, type, title, logScale, scaleY, line, curved}) => {
 
   const [chartData, setChartData] = useState([[1, 1.0, 10]])
   const [maxSeason, setMaxSeason] = useState(10)
@@ -51,7 +51,7 @@ const SeasonChart = ({tconst, type, title, logScale, scaleY, line}) => {
         vAxis: {
           title: (type === "rating" ? "Average Rating" : "Number of Votes")
         },
-        curveType: 'function'
+        curveType: (curved === true) ? 'function' : 'none'
       }}
     />
   )

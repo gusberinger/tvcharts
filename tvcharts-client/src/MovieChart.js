@@ -37,6 +37,7 @@ const MovieChart = props => {
         format: 0,
         viewWindow: {min: 1, max: episodeCount}},
       lineWidth: (props.line === true) ? 3 : 0,
+      curveType: (props.curved === true) ? 'function' : 'none',
       // trendlines: { 0: {} },
       // explorer: {axis: 'horizontal', keepInBounds: true, maxZoomOut: 1}
     }

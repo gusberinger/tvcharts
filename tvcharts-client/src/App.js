@@ -87,6 +87,7 @@ const App = () => {
             scaleY={scaleY}
             logScale={logScale}
             showColors = {colors}
+            curved={curved}
           />
           <SeasonChart
             tconst={show}
@@ -95,6 +96,7 @@ const App = () => {
             scaleY={scaleY}
             logScale={logScale}
             line={lines}
+            curved={curved}
           />
         </div>
       </section>
