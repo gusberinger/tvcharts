@@ -27,6 +27,7 @@ const App = () => {
   const [scaleY, setScaleY] = useState(true)
   const [colors, setColors] = useState(true)
   const [logScale, setLogScale] = useState(false)
+  const [curved, setCurved] = useState(false)
   const n = Math.floor(Math.random()*topShows.length)
   const [show, setShow] = useState(topShows[n])
   const [title, setTitle] = useState(topShowsTitles[n])
@@ -68,6 +69,7 @@ const App = () => {
             : <></>}
             <button onClick={() => setColors(!colors)}>{colors ? "Hide Colors" : "Show Colors"}</button>
             <button onClick={() => setLogScale(!logScale)}>{logScale ? "Log Scale" : "Linear Scale"}</button>
+            <button onClick={() => setCurved(!curved)}>{curved ? "Curve Lines" : "No Curve"}</button>
           </div>
         </div>
       </section>
