@@ -14,6 +14,10 @@ const SeasonChart = ({tconst, type, title, logScale, scaleY, line}) => {
       res => res.json()
     ).then(
       data => {
+        for (let i = 0; i < data.length; i++) {
+          const annotation = `<b>Season ${data[i][0]}</b><br/>${data[i][2].toLocaleString("en-us")} Votes<br/>${data[i][1].toLocaleString("en-us")} Average Rating<br/>`
+          data[i].push(annotation)
+        }
         setChartData(data)
         const newMaxSeason = data[data.length - 1][0]
         setMaxSeason(newMaxSeason)
@@ -26,23 +30,28 @@ const SeasonChart = ({tconst, type, title, logScale, scaleY, line}) => {
       chartType='ScatterChart'
       data={[["Season Number", 
         (type === "votes") ? {"role": "none"} : "Votes",
-        (type === "votes") ? "Votes" : {"role": "none"}], 
+        (type === "votes") ? "Votes" : {"role": "none"}, 
+        { role: "tooltip", type: "string", p: { html: true }}],
         ...chartData]}
       width="100%"
       height="600px"
       loader={"Loading Chart..."}
       options={{
-        title: `IMDb ${(type === "votes" ? "Average Votes" : "Rating")} by Season - ${title}`,
+        title: `Average IMDb ${(type === "votes" ? "Votes" : "Rating")} by Season - ${title}`,
         viewWindow: (scaleY) ? {min: 0, max: 10} : {},
         scaleType: (logScale) ? "log" : "linear",
         pointSize: 10,
         lineWidth: (line === true) ? 3 : 0,
         legend: "none",
+        tooltip: { isHtml: true, trigger: 'both' },
         hAxis: { 
           title: "Season Number",
           format: 0,
-          // viewWindow: {min: 1, maxSe}
           viewWindow: {min: 1, max: maxSeason}},
+        vAxis: {
+          title: (type === "rating" ? "Average Rating" : "Number of Votes")
+        },
+        curveType: 'function'
       }}
     />
   )
