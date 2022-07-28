@@ -100,6 +100,17 @@ def get_episodes(tconst: str) -> dict:
         json.headers.add("Access-Control-Allow-Origin", "*")
     return json
 
+@app.route("/season/<tconst>", methods=["GET"])
+def get_season(tconst: str):
+    with engine.connect() as connection:
+        season_query = connection.execute(
+            f"SELECT seasonNumber, averageRating, numVotes FROM seasons WHERE parentTconst='{tconst}'"
+        ).fetchall()
+    data = [[season_number, rating, vote] for season_number, rating, vote in season_query]
+    json = {"data": data}
+    json = jsonify(data)
+    json.headers.add("Access-Control-Allow-Origin", "*")
+    return json
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

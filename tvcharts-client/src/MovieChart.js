@@ -12,7 +12,8 @@ const MovieChart = props => {
     setTitle(data["title"])
     setVoteRows(data["numVotes"])
     setRatingRows(data["averageRating"])
-    setEpisodeCount(data["numVotes"].length + 1)
+    const n = data["numVotes"].length - 1
+    setEpisodeCount(data["numVotes"][n][0])
   }
 
   useEffect(() => {
@@ -36,6 +37,7 @@ const MovieChart = props => {
         format: 0,
         viewWindow: {min: 1, max: episodeCount}},
       lineWidth: (props.line === true) ? 3 : 0,
+      curveType: (props.curved === true) ? 'function' : 'none',
       // trendlines: { 0: {} },
       // explorer: {axis: 'horizontal', keepInBounds: true, maxZoomOut: 1}
     }
@@ -43,14 +45,18 @@ const MovieChart = props => {
   const ratingOptions = {
     ...optionsTemplate,
     title:  `IMDB Average Rating - ${title}`,
-    vAxis: { title: "Average Rating", viewWindow: (props.scaleY) ? {min: 0, max: 10} : {}},
+    vAxis: { 
+      title: "Average Rating",
+      viewWindow: (props.scaleY) ? {min: 0, max: 10} : {},
+      scaleType: (props.logScale) ? "log" : "linear"
+    },
     width_units: '%'
   }
 
   const votesOptions = {
     ...optionsTemplate,
     title: `IMDB Votes - ${title}`,
-    vAxis: { title: "Number of Votes" },
+    vAxis: { title: "Number of Votes", scaleType: (props.logScale) ? "log" : "linear" },
   }
 
   return (
