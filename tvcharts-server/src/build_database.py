@@ -86,6 +86,7 @@ if __name__ == "__main__":
             # to_sql can't specify dtype automatically
             dtype={
                 "tconst": "VARCHAR(10) PRIMARY KEY",
+                "cumEpisodeNumber": "INTEGER",
                 "parentTcont": "VARCHAR(10)",
                 "seasonNumber": "INTEGER",
                 "episodeNumber": "INTEGER",
@@ -95,6 +96,16 @@ if __name__ == "__main__":
                 "endYear": "INTEGER",
             },
         )
+    
+    # create seasons database
+    print("Creating seasons table...")
+    seasons = episodes.groupby(by = ["parentTconst", "seasonNumber"]).mean()
+    seasons = seasons.drop(["cumEpisodeNumber", "episodeNumber", "startYear", "endYear"], axis=1)
+    seasons = seasons.reset_index()
+    seasons = seasons.sort_values(by = ["parentTconst", "seasonNumber"])
+    with sqlite3.connect(db_path) as con:
+        seasons.to_sql("seasons", con=con, index=False, chunksize=10 ** 6)
+
 
     print("Creating search table...")
     basic_series = basics[basics["titleType"] == "tvSeries"]
