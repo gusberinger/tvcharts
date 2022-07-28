@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react'
 import MovieChart from './MovieChart'
 import SearchBar from './SearchBar'
 import './App.css'
+import SeasonChart from './SeasonChart'
 
 
 const topShows = [
@@ -84,7 +85,15 @@ const App = () => {
             scaleY={scaleY}
             logScale={logScale}
             showColors = {colors}
-            />
+          />
+          <SeasonChart
+            tconst={show}
+            type={type}
+            title={title}
+            scaleY={scaleY}
+            logScale={logScale}
+            line={lines}
+          />
         </div>
       </section>
     </>
