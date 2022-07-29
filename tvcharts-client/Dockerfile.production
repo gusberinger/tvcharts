@@ -18,4 +18,5 @@ RUN pip3 install pip --upgrade
 RUN pip3 install certbot-nginx
 RUN mkdir /etc/letsencrypt
 EXPOSE 80
+EXPOSE 443
 ENTRYPOINT ["nginx", "-g", "daemon off;"]
